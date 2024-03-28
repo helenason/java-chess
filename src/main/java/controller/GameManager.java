@@ -38,6 +38,10 @@ public class GameManager {
         while (chess.canContinue() && wantMove(chess)) {
             tryMoveUntilNoError(chess);
         }
+        if (!chess.canContinue()) {
+            ChessResult result = chess.judge();
+            outputView.printResult(result);
+        }
     }
 
     private Chess initChess() {
