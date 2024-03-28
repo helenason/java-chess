@@ -21,10 +21,13 @@ public class Board {
     }
 
     public static Board create() {
-        SquaresGenerator squaresGenerator = new SquaresGenerator();
-        Map<Position, Piece> squares = squaresGenerator.generate();
-        return new Board(squares);
+        return create(new SquaresGenerator());
     }
+
+    public static Board create(BoardGenerator boardGenerator) {
+        Map<Position, Piece> squares = boardGenerator.generate();
+        return new Board(squares);
+    } // TODO: 오직 테스트만을 위한 메서드?
 
     public Piece findPieceByPosition(Position position) {
         return squares.get(position);
@@ -50,8 +53,8 @@ public class Board {
 
     public Map<Piece, Integer> findRemainPieces(Color color) {
         Map<Piece, Integer> remainPieces = new HashMap<>();
-        squares.values()
-                .stream().filter(piece -> piece.hasColor(color))
+        squares.values().stream()
+                .filter(piece -> piece.hasColor(color))
                 .forEach(piece -> {
                     remainPieces.putIfAbsent(piece, 0);
                     remainPieces.computeIfPresent(piece, (key, value) -> value + 1);

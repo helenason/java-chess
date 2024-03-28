@@ -19,8 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class SquaresGenerator {
+public class SquaresGenerator implements BoardGenerator {
 
+    @Override
     public Map<Position, Piece> generate() {
         Map<Position, Piece> squares = new HashMap<>();
 
