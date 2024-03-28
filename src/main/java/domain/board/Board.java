@@ -14,6 +14,8 @@ import java.util.Map;
 
 public class Board {
 
+    private static final int KING_COUNT = 2;
+
     private final Map<Position, Piece> squares;
 
     private Board(Map<Position, Piece> squares) {
@@ -80,7 +82,9 @@ public class Board {
                 .toList();
     }
 
-    public boolean hasKing() {
-        return squares.values().stream().anyMatch(Piece::isKing);
+    public boolean checkKingsAlive() {
+        return squares.values().stream()
+                .filter(Piece::isKing)
+                .count() == KING_COUNT;
     }
 }

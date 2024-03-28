@@ -1,5 +1,6 @@
 package domain.board;
 
+import static domain.piece.PositionFixture.A1;
 import static domain.piece.PositionFixture.A3;
 import static domain.piece.PositionFixture.A4;
 import static domain.piece.PositionFixture.A5;
@@ -153,19 +154,33 @@ public class BoardTest {
     }
 
     @Test
-    @DisplayName("보드에 킹이 있는 경우 참을 반환한다.")
-    void hasKing_True() {
-        boolean hasKing = board.hasKing();
+    @DisplayName("보드에 킹 두 개가 모두 있는 경우 참을 반환한다.")
+    void hasKing_All_True() {
+        boolean hasKing = board.checkKingsAlive();
 
         assertThat(hasKing).isTrue();
     }
 
     @Test
+    @DisplayName("보드에 킹이 하나 있는 경우 거짓을 반환한다.")
+    void hasKing_One_False() {
+        board = Board.create(() -> {
+            Map<Position, Piece> squares = new HashMap<>();
+            squares.put(A1, new King(Color.BLACK));
+            return squares;
+        });
+
+        boolean hasKing = board.checkKingsAlive();
+
+        assertThat(hasKing).isFalse();
+    }
+
+    @Test
     @DisplayName("보드에 킹이 없는 경우 거짓을 반환한다.")
-    void hasKing_False() {
+    void hasKing_No_False() {
         board = Board.create(HashMap::new);
 
-        boolean hasKing = board.hasKing();
+        boolean hasKing = board.checkKingsAlive();
 
         assertThat(hasKing).isFalse();
     }

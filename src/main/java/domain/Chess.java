@@ -67,7 +67,7 @@ public class Chess {
     }
 
     public boolean canContinue() {
-        return board.hasKing();
+        return board.checkKingsAlive();
     }
 
     public Board getBoard() {
