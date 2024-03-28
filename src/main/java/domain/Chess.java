@@ -5,15 +5,18 @@ import domain.board.Turn;
 import domain.piece.Color;
 import domain.piece.Piece;
 import domain.position.Position;
+import domain.result.ChessResult;
 
 public class Chess {
 
     private final Board board;
+    private final ScoreCalculator scoreCalculator;
     private Turn turn;
 
     public Chess() {
         this.board = Board.create();
         this.turn = new Turn(Color.WHITE);
+        this.scoreCalculator = new ScoreCalculator();
     }
 
     public void tryMove(Position sourcePosition, Position targetPosition) {
@@ -68,6 +71,16 @@ public class Chess {
 
     public boolean canContinue() {
         return board.checkKingsAlive();
+    }
+
+    public ChessResult judge() {
+        double own = scoreCalculator.calculate(board, turn);
+        double opponent = scoreCalculator.calculate(board, turn.next());
+
+        if (turn.isWhite()) {
+            return new ChessResult(own, opponent);
+        }
+        return new ChessResult(opponent, own);
     }
 
     public Board getBoard() {

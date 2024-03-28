@@ -2,9 +2,11 @@ package view;
 
 import domain.board.Board;
 import domain.board.Turn;
+import domain.piece.Color;
 import domain.piece.Piece;
 import domain.position.File;
 import domain.position.Rank;
+import domain.result.ChessResult;
 import java.util.Arrays;
 import java.util.List;
 import view.mapper.PieceOutput;
@@ -62,4 +64,24 @@ public class OutputView {
         System.out.println(errorMessage);
     }
 
+    public void printResult(ChessResult result) {
+        System.out.println("\n> 체스 게임을 종료합니다.\n");
+        System.out.println("=== 게임 점수 ===");
+
+        System.out.printf("화이트(소문자) 진영: %1.1f\n", result.getWhiteScore());
+        System.out.printf("블랙(대문자) 진영: %1.1f\n", result.getBlackScore());
+        System.out.println();
+
+        System.out.println("=== 게임 결과 ===");
+        Color winner = result.findWinner();
+        if (winner.isWhite()) {
+            System.out.println("우승자는 화이트(소문자) 진영입니다.");
+            return;
+        }
+        if (winner.isBlack()) {
+            System.out.println("우승자는 블랙(대문자) 진영입니다.");
+            return;
+        }
+        System.out.println("무승부입니다.");
+    }
 }

@@ -1,8 +1,8 @@
 package controller;
 
 import domain.Chess;
-import domain.board.Turn;
 import domain.position.Position;
+import domain.result.ChessResult;
 import view.InputView;
 import view.OutputView;
 
@@ -35,7 +35,7 @@ public class GameManager {
 
     private void playGame() {
         Chess chess = initChess();
-        while (chess.canContinue() && wantMove(chess.getTurn())) {
+        while (chess.canContinue() && wantMove(chess)) {
             tryMoveUntilNoError(chess);
         }
     }
@@ -46,8 +46,8 @@ public class GameManager {
         return chess;
     }
 
-    private boolean wantMove(Turn turn) {
-        outputView.printTurn(turn);
+    private boolean wantMove(Chess chess) {
+        outputView.printTurn(chess.getTurn());
         Command command = requestCommand();
         if (command.isEnd()) {
             return false;
@@ -56,7 +56,12 @@ public class GameManager {
             playGame();
             return false;
         }
-        return true;
+        if (command.isStatus()) {
+            ChessResult result = chess.judge();
+            outputView.printResult(result);
+            return false;
+        }
+        return true; // TODO: if문 리팩토링
     }
 
     private Command requestCommand() {
