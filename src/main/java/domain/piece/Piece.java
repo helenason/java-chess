@@ -42,12 +42,16 @@ public abstract class Piece {
         return (isBlack() && targetPiece.isBlack()) || (isWhite() && targetPiece.isWhite());
     }
 
-    public boolean isSameColor(Color color) {
+    public boolean hasColor(Color color) {
         return this.color == color;
     }
 
     public boolean isNotTurn(Turn turn) {
         return turn.isNotTurn(color);
+    }
+
+    public boolean isPawn() {
+        return false;
     }
 
     @Override

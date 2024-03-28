@@ -1,5 +1,10 @@
 package domain.board;
 
+import static domain.piece.PositionFixture.A3;
+import static domain.piece.PositionFixture.A4;
+import static domain.piece.PositionFixture.A5;
+import static domain.piece.PositionFixture.A7;
+import static domain.piece.PositionFixture.B2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -125,5 +130,24 @@ public class BoardTest {
             assertThat(actual).containsEntry(new Rook(Color.BLACK), 2);
             assertThat(actual).containsEntry(new Pawn(Color.BLACK), 8);
         });
+    }
+
+    @Test
+    @DisplayName("같은 세로줄(파일)에 같은 색 폰이 있는 경우 참을 반환한다..")
+    void hasSameColorPawnAtSameFile_True() {
+        board.movePiece(A7, A5);
+        board.movePiece(A5, A4);
+        board.movePiece(A4, A3);
+        board.movePiece(B2, A3);
+
+        boolean hasSameColorPawnAtSameFile = board.hasSameColorPawnAtSameFile(Color.WHITE);
+        assertThat(hasSameColorPawnAtSameFile).isTrue();
+    }
+
+    @Test
+    @DisplayName("같은 세로줄(파일)에 같은 색 폰이 없는 경우 거짓을 반환한다..")
+    void hasSameColorPawnAtSameFile_False() {
+        boolean hasSameColorPawnAtSameFile = board.hasSameColorPawnAtSameFile(Color.WHITE);
+        assertThat(hasSameColorPawnAtSameFile).isFalse();
     }
 }

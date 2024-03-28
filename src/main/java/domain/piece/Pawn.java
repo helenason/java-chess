@@ -72,4 +72,9 @@ public class Pawn extends Piece {
         return source.isLegalRankStep(target, ONE_STEP)
                 && source.isLegalFileStep(target, ONE_STEP);
     }
+
+    @Override
+    public boolean isPawn() {
+        return true;
+    }
 }

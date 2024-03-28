@@ -24,6 +24,10 @@ public class Position {
         return ranks.contains(rank);
     }
 
+    public boolean hasFile(File file) {
+        return this.file == file;
+    }
+
     public boolean isUp(Position target) {
         return file == target.file && rank.isUp(target.rank);
     }
