@@ -14,7 +14,7 @@ public class Board {
 
     private final Map<Position, Piece> squares;
 
-    public Board(Map<Position, Piece> squares) {
+    private Board(Map<Position, Piece> squares) {
         this.squares = squares;
     }
 
