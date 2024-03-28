@@ -7,6 +7,7 @@ import domain.position.File;
 import domain.position.Position;
 import domain.position.PositionGenerator;
 import domain.position.Rank;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,5 +44,17 @@ public class Board {
         return betweenPositions.stream()
                 .map(this::findPieceByPosition)
                 .anyMatch(Piece::isNotBlank);
+    }
+
+
+    public Map<Piece, Integer> findRemainPieces(Color color) {
+        Map<Piece, Integer> remainPieces = new HashMap<>();
+        squares.values()
+                .stream().filter(piece -> piece.isSameColor(color))
+                .forEach(piece -> {
+                    remainPieces.putIfAbsent(piece, 0);
+                    remainPieces.computeIfPresent(piece, (key, value) -> value + 1);
+                });
+        return remainPieces;
     }
 }

@@ -1,15 +1,21 @@
 package domain.board;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
+import domain.piece.Bishop;
 import domain.piece.Color;
+import domain.piece.King;
+import domain.piece.Knight;
 import domain.piece.Pawn;
 import domain.piece.Piece;
+import domain.piece.Queen;
 import domain.piece.Rook;
 import domain.position.File;
 import domain.position.Position;
 import domain.position.PositionGenerator;
 import domain.position.Rank;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -89,5 +95,35 @@ public class BoardTest {
         boolean actual = board.isBlocked(source, target);
 
         assertThat(actual).isFalse();
+    }
+
+    @Test
+    @DisplayName("남아있는 하얀 기물에 대한 정보를 맵 형태로 반환한다.")
+    void findRemainPieces_White() {
+        Map<Piece, Integer> actual = board.findRemainPieces(Color.WHITE);
+
+        assertAll(() -> {
+            assertThat(actual).containsEntry(new Bishop(Color.WHITE), 2);
+            assertThat(actual).containsEntry(new King(Color.WHITE), 1);
+            assertThat(actual).containsEntry(new Knight(Color.WHITE), 2);
+            assertThat(actual).containsEntry(new Queen(Color.WHITE), 1);
+            assertThat(actual).containsEntry(new Rook(Color.WHITE), 2);
+            assertThat(actual).containsEntry(new Pawn(Color.WHITE), 8);
+        });
+    }
+
+    @Test
+    @DisplayName("남아있는 검정 기물에 대한 정보를 맵 형태로 반환한다.")
+    void findRemainPieces_Black() {
+        Map<Piece, Integer> actual = board.findRemainPieces(Color.BLACK);
+
+        assertAll(() -> {
+            assertThat(actual).containsEntry(new Bishop(Color.BLACK), 2);
+            assertThat(actual).containsEntry(new King(Color.BLACK), 1);
+            assertThat(actual).containsEntry(new Knight(Color.BLACK), 2);
+            assertThat(actual).containsEntry(new Queen(Color.BLACK), 1);
+            assertThat(actual).containsEntry(new Rook(Color.BLACK), 2);
+            assertThat(actual).containsEntry(new Pawn(Color.BLACK), 8);
+        });
     }
 }
