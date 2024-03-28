@@ -51,7 +51,7 @@ public class OutputView {
         System.out.println();
     }
 
-    public void printTurn(Turn turn) {
+    public void printTurn(Turn turn) { // TODO: TurnOutput enum 클래스 활용하여 리팩토링
         if (turn.isBlack()) {
             System.out.println("블랙(대문자) 진영의 차례입니다.");
         }
@@ -64,7 +64,7 @@ public class OutputView {
         System.out.println(errorMessage);
     }
 
-    public void printResult(ChessResult result) {
+    public void printResult(ChessResult result) { // TODO: TurnOutput enum 클래스 활용하여 리팩토링
         System.out.println("\n> 체스 게임을 종료합니다.\n");
         System.out.println("=== 게임 점수 ===");
 
