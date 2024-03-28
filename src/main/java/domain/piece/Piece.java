@@ -54,6 +54,10 @@ public abstract class Piece {
         return false;
     }
 
+    public boolean isNotPawn() {
+        return true;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
