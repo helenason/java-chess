@@ -55,4 +55,8 @@ public enum File {
     private boolean isBetween(int number, int from, int to) {
         return number > from && number < to;
     }
+
+    public int order() {
+        return order;
+    }
 }

@@ -120,6 +120,14 @@ public class Position {
         return positions;
     }
 
+    public int rank() {
+        return rank.order();
+    }
+
+    public int file() {
+        return file.order();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
