@@ -36,18 +36,20 @@ public class ScoreCalculator {
     public double calculate(Board board, Turn turn) {
         Color color = decideColor(turn);
         Map<Piece, Integer> remainPieces = board.findRemainPieces(color);
-        double total = remainPieces.entrySet().stream()
+        double notPawnScore = remainPieces.entrySet().stream()
                 .filter(entry -> entry.getKey().isNotPawn())
-                .mapToDouble(entry -> ScoreCalculator.score.getOrDefault(entry.getKey(), 0D) * entry.getValue())
+                .mapToDouble(entry -> score.getOrDefault(entry.getKey(), 0D) * entry.getValue())
                 .sum();
-        boolean hasSameColorPawnAtSameFile = board.hasSameColorPawnAtSameFile(color);
         Pawn pawn = new Pawn(color);
+        if (!remainPieces.containsKey(pawn)) {
+            return notPawnScore;
+        }
+        boolean hasSameColorPawnAtSameFile = board.hasSameColorPawnAtSameFile(color);
         double pawnScore = remainPieces.get(pawn) * score.get(pawn);
         if (hasSameColorPawnAtSameFile && remainPieces.containsKey(pawn)) {
-            total += pawnScore * 0.5;
+            return notPawnScore + pawnScore * 0.5;
         }
-        total += pawnScore;
-        return total;
+        return notPawnScore + pawnScore;
     }
 
     private Color decideColor(Turn turn) {
