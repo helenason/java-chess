@@ -79,4 +79,8 @@ public class Board {
                 .map(this::findPieceByPosition)
                 .toList();
     }
+
+    public boolean hasKing() {
+        return squares.values().stream().anyMatch(Piece::isKing);
+    }
 }

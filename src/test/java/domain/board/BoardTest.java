@@ -20,6 +20,7 @@ import domain.position.File;
 import domain.position.Position;
 import domain.position.PositionGenerator;
 import domain.position.Rank;
+import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -133,7 +134,7 @@ public class BoardTest {
     }
 
     @Test
-    @DisplayName("같은 세로줄(파일)에 같은 색 폰이 있는 경우 참을 반환한다..")
+    @DisplayName("같은 세로줄(파일)에 같은 색 폰이 있는 경우 참을 반환한다.")
     void hasSameColorPawnAtSameFile_True() {
         board.movePiece(A7, A5);
         board.movePiece(A5, A4);
@@ -145,9 +146,27 @@ public class BoardTest {
     }
 
     @Test
-    @DisplayName("같은 세로줄(파일)에 같은 색 폰이 없는 경우 거짓을 반환한다..")
+    @DisplayName("같은 세로줄(파일)에 같은 색 폰이 없는 경우 거짓을 반환한다.")
     void hasSameColorPawnAtSameFile_False() {
         boolean hasSameColorPawnAtSameFile = board.hasSameColorPawnAtSameFile(Color.WHITE);
         assertThat(hasSameColorPawnAtSameFile).isFalse();
+    }
+
+    @Test
+    @DisplayName("보드에 킹이 있는 경우 참을 반환한다.")
+    void hasKing_True() {
+        boolean hasKing = board.hasKing();
+
+        assertThat(hasKing).isTrue();
+    }
+
+    @Test
+    @DisplayName("보드에 킹이 없는 경우 거짓을 반환한다.")
+    void hasKing_False() {
+        board = Board.create(HashMap::new);
+
+        boolean hasKing = board.hasKing();
+
+        assertThat(hasKing).isFalse();
     }
 }

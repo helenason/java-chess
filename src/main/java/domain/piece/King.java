@@ -21,4 +21,9 @@ public class King extends Piece {
                 && source.isLegalRankStep(target, ZERO_STEP, ONE_STEP)
                 && source.isLegalFileStep(target, ZERO_STEP, ONE_STEP);
     }
+
+    @Override
+    public boolean isKing() {
+        return true;
+    }
 }
