@@ -21,7 +21,7 @@ public class Board {
     }
 
     public static Board create() {
-        return create(new SquaresGenerator());
+        return create(new InitBoardGenerator());
     }
 
     public static Board create(BoardGenerator boardGenerator) {

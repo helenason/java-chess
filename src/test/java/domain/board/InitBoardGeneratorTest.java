@@ -21,14 +21,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-class SquaresGeneratorTest {
+class InitBoardGeneratorTest {
 
     @Test
     @DisplayName("64개의 칸을 생성한다.")
     void generate_SquaresSize() {
-        SquaresGenerator squaresGenerator = new SquaresGenerator();
+        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
 
-        Map<Position, Piece> squares = squaresGenerator.generate();
+        Map<Position, Piece> squares = initBoardGenerator.generate();
 
         assertThat(squares).hasSize(64);
     }
@@ -36,8 +36,8 @@ class SquaresGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 폰은 A2 B2 C2 D2 E2 F2 G2 H2에 위치한다.")
     void generate_Pawn() {
-        SquaresGenerator squaresGenerator = new SquaresGenerator();
-        Map<Position, Piece> squares = squaresGenerator.generate();
+        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
+        Map<Position, Piece> squares = initBoardGenerator.generate();
 
         Piece actual1 = squares.get(PositionGenerator.generate(File.A, Rank.TWO));
         Piece actual2 = squares.get(PositionGenerator.generate(File.B, Rank.TWO));
@@ -63,8 +63,8 @@ class SquaresGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 룩은 A1 A8 H1 H8에 위치한다.")
     void generate_Rook() {
-        SquaresGenerator squaresGenerator = new SquaresGenerator();
-        Map<Position, Piece> squares = squaresGenerator.generate();
+        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
+        Map<Position, Piece> squares = initBoardGenerator.generate();
 
         Piece actual1 = squares.get(PositionGenerator.generate(File.A, Rank.ONE));
         Piece actual2 = squares.get(PositionGenerator.generate(File.A, Rank.EIGHT));
@@ -82,8 +82,8 @@ class SquaresGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 나이트는 B1 B8 G1 G8에 위치한다.")
     void generate_Knight() {
-        SquaresGenerator squaresGenerator = new SquaresGenerator();
-        Map<Position, Piece> squares = squaresGenerator.generate();
+        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
+        Map<Position, Piece> squares = initBoardGenerator.generate();
 
         Piece actual1 = squares.get(PositionGenerator.generate(File.B, Rank.ONE));
         Piece actual2 = squares.get(PositionGenerator.generate(File.B, Rank.EIGHT));
@@ -101,8 +101,8 @@ class SquaresGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 비숍은 C1 C8 F1 F8에 위치한다.")
     void generate_Bishop() {
-        SquaresGenerator squaresGenerator = new SquaresGenerator();
-        Map<Position, Piece> squares = squaresGenerator.generate();
+        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
+        Map<Position, Piece> squares = initBoardGenerator.generate();
 
         Piece actual1 = squares.get(PositionGenerator.generate(File.C, Rank.ONE));
         Piece actual2 = squares.get(PositionGenerator.generate(File.C, Rank.EIGHT));
@@ -120,8 +120,8 @@ class SquaresGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 퀸은 D1 D8에 위치한다.")
     void generate_Queen() {
-        SquaresGenerator squaresGenerator = new SquaresGenerator();
-        Map<Position, Piece> squares = squaresGenerator.generate();
+        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
+        Map<Position, Piece> squares = initBoardGenerator.generate();
 
         Piece actual1 = squares.get(PositionGenerator.generate(File.D, Rank.ONE));
         Piece actual2 = squares.get(PositionGenerator.generate(File.D, Rank.EIGHT));
@@ -135,8 +135,8 @@ class SquaresGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 킹은 E1 E8에 위치한다.")
     void generate_King() {
-        SquaresGenerator squaresGenerator = new SquaresGenerator();
-        Map<Position, Piece> squares = squaresGenerator.generate();
+        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
+        Map<Position, Piece> squares = initBoardGenerator.generate();
 
         Piece actual1 = squares.get(PositionGenerator.generate(File.E, Rank.ONE));
         Piece actual2 = squares.get(PositionGenerator.generate(File.E, Rank.EIGHT));
@@ -151,8 +151,8 @@ class SquaresGeneratorTest {
     @EnumSource(names = {"A", "B", "C", "D", "E", "F", "G", "H"})
     @DisplayName("게임 시작 시 랭크 3, 4, 5, 6은 비어있다.")
     void generate_None(File file) {
-        SquaresGenerator squaresGenerator = new SquaresGenerator();
-        Map<Position, Piece> squares = squaresGenerator.generate();
+        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
+        Map<Position, Piece> squares = initBoardGenerator.generate();
 
         Piece actual1 = squares.get(PositionGenerator.generate(file, Rank.THREE));
         Piece actual2 = squares.get(PositionGenerator.generate(file, Rank.FOUR));
