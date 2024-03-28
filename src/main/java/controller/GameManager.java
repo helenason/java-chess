@@ -35,7 +35,7 @@ public class GameManager {
 
     private void playGame() {
         Chess chess = initChess();
-        while (wantMove(chess.getTurn())) {
+        while (wantMove(chess.getTurn()) && chess.canContinue()) {
             tryMoveUntilNoError(chess);
         }
     }

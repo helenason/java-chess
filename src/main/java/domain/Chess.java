@@ -66,6 +66,10 @@ public class Chess {
         }
     }
 
+    public boolean canContinue() {
+        return board.hasKing();
+    }
+
     public Board getBoard() {
         return board;
     }
