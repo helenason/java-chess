@@ -1,5 +1,7 @@
 package domain.board;
 
+import dao.BoardDao;
+import data.BoardData;
 import domain.piece.Color;
 import domain.piece.None;
 import domain.piece.Piece;
@@ -16,10 +18,7 @@ public class Board {
 
     private static final int KING_COUNT = 2;
 
-    private final Map<Position, Piece> squares;
-
     private Board(Map<Position, Piece> squares) {
-        this.squares = squares;
     }
 
     public static Board create() {
@@ -31,18 +30,20 @@ public class Board {
         return new Board(squares);
     } // TODO: 오직 테스트만을 위한 메서드?
 
-    public Piece findPieceByPosition(Position position) {
-        return squares.get(position);
+    public Piece findPieceByPosition(File file, Rank rank) {
+        return findPieceByPosition(PositionGenerator.generate(file, rank));
     }
 
-    public Piece findPieceByPosition(File file, Rank rank) {
-        return squares.get(PositionGenerator.generate(file, rank));
+    public Piece findPieceByPosition(Position position) {
+        BoardDao boardDao = new BoardDao();
+        return boardDao.findByPosition(position).orElseGet(() -> new None(Color.NONE));
     }
 
     public void movePiece(Position source, Position target) {
         Piece sourcePiece = findPieceByPosition(source);
-        squares.replace(target, sourcePiece);
-        squares.replace(source, new None(Color.NONE));
+        BoardDao boardDao = new BoardDao();
+        boardDao.update(target, sourcePiece);
+        boardDao.update(source, new None(Color.NONE));
     }
 
     public boolean isBlocked(Position source, Position target) {
@@ -55,8 +56,13 @@ public class Board {
 
     public Map<Piece, Integer> findRemainPieces(Color color) {
         Map<Piece, Integer> remainPieces = new HashMap<>();
-        squares.values().stream()
-                .filter(piece -> piece.hasColor(color))
+
+        BoardDao boardDao = new BoardDao();
+        List<BoardData> allPieces = boardDao.findAll();
+
+        allPieces.stream()
+                .filter(boardData -> boardData.hasColor(color))
+                .map(BoardData::getPiece)
                 .forEach(piece -> {
                     remainPieces.putIfAbsent(piece, 0);
                     remainPieces.computeIfPresent(piece, (key, value) -> value + 1);
@@ -76,14 +82,15 @@ public class Board {
     }
 
     private List<Piece> findPiecesByFile(File file) {
-        return squares.keySet().stream()
-                .filter(position -> position.hasFile(file))
-                .map(this::findPieceByPosition)
-                .toList();
+        BoardDao boardDao = new BoardDao();
+        return boardDao.findByFile(file);
     }
 
     public boolean checkKingsAlive() {
-        return squares.values().stream()
+        BoardDao boardDao = new BoardDao();
+        List<BoardData> boardData = boardDao.findAll();
+        return boardData.stream()
+                .map(BoardData::getPiece)
                 .filter(Piece::isKing)
                 .count() == KING_COUNT;
     }

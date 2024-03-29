@@ -4,6 +4,7 @@ import static domain.piece.PositionFixture.A1;
 import static domain.piece.PositionFixture.A2;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import dao.BoardDao;
 import domain.board.Board;
 import domain.board.Turn;
 import domain.piece.Bishop;
@@ -56,8 +57,11 @@ public class ScoreCalculatorTest {
     @DisplayName("퀸은 9점으로 계산한다.")
     void calculate_Queen_Nine() {
         Board board = Board.create(() -> {
+            BoardDao boardDao = new BoardDao();
+            boardDao.deleteAll();
             Map<Position, Piece> squares = new HashMap<>();
             squares.put(A1, new Queen(Color.WHITE));
+            boardDao.save(A1, new Queen(Color.WHITE));
             return squares;
         });
 
@@ -72,8 +76,11 @@ public class ScoreCalculatorTest {
     @DisplayName("룩은 5점으로 계산한다.")
     void calculate_Rook_Five() {
         Board board = Board.create(() -> {
+            BoardDao boardDao = new BoardDao();
+            boardDao.deleteAll();
             Map<Position, Piece> squares = new HashMap<>();
             squares.put(A1, new Rook(Color.WHITE));
+            boardDao.save(A1, new Rook(Color.WHITE));
             return squares;
         });
 
@@ -88,8 +95,11 @@ public class ScoreCalculatorTest {
     @DisplayName("비숍은 3점으로 계산한다.")
     void calculate_Bishop_Three() {
         Board board = Board.create(() -> {
+            BoardDao boardDao = new BoardDao();
+            boardDao.deleteAll();
             Map<Position, Piece> squares = new HashMap<>();
             squares.put(A1, new Bishop(Color.WHITE));
+            boardDao.save(A1, new Bishop(Color.WHITE));
             return squares;
         });
 
@@ -104,8 +114,11 @@ public class ScoreCalculatorTest {
     @DisplayName("나이트는 2.5점으로 계산한다.")
     void calculate_Bishop_TwoPointFive() {
         Board board = Board.create(() -> {
+            BoardDao boardDao = new BoardDao();
+            boardDao.deleteAll();
             Map<Position, Piece> squares = new HashMap<>();
             squares.put(A1, new Knight(Color.WHITE));
+            boardDao.save(A1, new Knight(Color.WHITE));
             return squares;
         });
 
@@ -120,8 +133,11 @@ public class ScoreCalculatorTest {
     @DisplayName("킹은 0점으로 계산한다.")
     void calculate_King_Zero() {
         Board board = Board.create(() -> {
+            BoardDao boardDao = new BoardDao();
+            boardDao.deleteAll();
             Map<Position, Piece> squares = new HashMap<>();
             squares.put(A1, new King(Color.WHITE));
+            boardDao.save(A1, new King(Color.WHITE));
             return squares;
         });
 
@@ -136,8 +152,11 @@ public class ScoreCalculatorTest {
     @DisplayName("폰은 1점으로 계산한다.")
     void calculate_Pawn_One() {
         Board board = Board.create(() -> {
+            BoardDao boardDao = new BoardDao();
+            boardDao.deleteAll();
             Map<Position, Piece> squares = new HashMap<>();
             squares.put(A1, new Pawn(Color.WHITE));
+            boardDao.save(A1, new Pawn(Color.WHITE));
             return squares;
         });
 
@@ -162,9 +181,13 @@ public class ScoreCalculatorTest {
     @DisplayName("하나의 파일에 같은 색 폰이 2개 이상일 경우 폰의 점수는 0.5점으로 계산한다.")
     void calculate_PawnsOnSameFile_ZeroPointFive() {
         Board board = Board.create(() -> {
+            BoardDao boardDao = new BoardDao();
+            boardDao.deleteAll();
             Map<Position, Piece> squares = new HashMap<>();
             squares.put(A1, new Pawn(Color.WHITE));
             squares.put(A2, new Pawn(Color.WHITE));
+            boardDao.save(A1, new Pawn(Color.WHITE));
+            boardDao.save(A2, new Pawn(Color.WHITE));
             return squares;
         });
 

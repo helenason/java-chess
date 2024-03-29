@@ -9,6 +9,7 @@ import static domain.piece.PositionFixture.B2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import dao.BoardDao;
 import domain.piece.Bishop;
 import domain.piece.Color;
 import domain.piece.King;
@@ -165,8 +166,11 @@ public class BoardTest {
     @DisplayName("보드에 킹이 하나 있는 경우 거짓을 반환한다.")
     void hasKing_One_False() {
         board = Board.create(() -> {
+            BoardDao boardDao = new BoardDao();
+            boardDao.deleteAll();
             Map<Position, Piece> squares = new HashMap<>();
             squares.put(A1, new King(Color.BLACK));
+            boardDao.save(A1, new King(Color.BLACK));
             return squares;
         });
 
@@ -178,7 +182,11 @@ public class BoardTest {
     @Test
     @DisplayName("보드에 킹이 없는 경우 거짓을 반환한다.")
     void hasKing_No_False() {
-        board = Board.create(HashMap::new);
+        board = Board.create(() -> {
+            BoardDao boardDao = new BoardDao();
+            boardDao.deleteAll();
+            return new HashMap<>();
+        });
 
         boolean hasKing = board.checkKingsAlive();
 
