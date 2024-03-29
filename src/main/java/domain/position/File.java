@@ -23,6 +23,13 @@ public enum File {
         this.order = order;
     }
 
+    public static File asFile(int fileOrder) {
+        return Arrays.stream(File.values())
+                .filter(file -> file.order() == fileOrder)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("[ERROR] 존재하지 않는 파일입니다."));
+    }
+
     public int distance(File target) {
         return Math.abs(order - target.order);
     }

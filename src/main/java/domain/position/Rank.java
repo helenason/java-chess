@@ -29,6 +29,13 @@ public enum Rank {
         return ranks;
     }
 
+    public static Rank asRank(int rankOrder) {
+        return Arrays.stream(Rank.values())
+                .filter(rank -> rank.order() == rankOrder)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("[ERROR] 존재하지 않는 랭크입니다."));
+    }
+
     public int distance(Rank target) {
         return Math.abs(order - target.order);
     }

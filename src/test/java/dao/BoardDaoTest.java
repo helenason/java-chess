@@ -14,6 +14,7 @@ import domain.piece.None;
 import domain.piece.Piece;
 import domain.piece.Queen;
 import domain.piece.Rook;
+import domain.position.File;
 import java.sql.Connection;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +52,22 @@ public class BoardDaoTest {
     }
 
     @Test
+    @DisplayName("해당 파일에 위치한 기물들을 리스트로 담아 반환한다.")
+    void findByFile_Success() {
+        BoardDao boardDao = new BoardDao();
+        Piece actual1 = new Rook(Color.WHITE);
+        Piece actual2 = new Bishop(Color.WHITE);
+        Piece actual3 = new Knight(Color.WHITE);
+        boardDao.save(A1, actual1);
+        boardDao.save(A2, actual2);
+        boardDao.save(A3, actual3);
+
+        List<Piece> pieces = boardDao.findByFile(File.A);
+
+        assertThat(pieces).containsExactly(actual1, actual2, actual3);
+    }
+
+    @Test
     @DisplayName("해당 위치에 기물이 있는 경우 기물을 Optional로 감싸 반환한다.")
     void findByPosition_Success() {
         BoardDao boardDao = new BoardDao();
@@ -84,11 +101,11 @@ public class BoardDaoTest {
         List<BoardData> boards = boardDao.findAll();
 
         assertThat(boards).containsExactly(
-                new BoardData(1, 1, "rook", "white"),
-                new BoardData(1, 2, "knight", "white"),
-                new BoardData(1, 3, "bishop", "black"),
-                new BoardData(1, 4, "queen", "black")
-        );
+                new BoardData(A1, new Rook(Color.WHITE)),
+                new BoardData(A2, new Knight(Color.WHITE)),
+                new BoardData(A3, new Bishop(Color.BLACK)),
+                new BoardData(A4, new Queen(Color.BLACK)
+                ));
     }
 
     @Test
