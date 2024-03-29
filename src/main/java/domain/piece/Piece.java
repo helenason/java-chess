@@ -62,6 +62,10 @@ public abstract class Piece {
         return false;
     }
 
+    public Color color() {
+        return color;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

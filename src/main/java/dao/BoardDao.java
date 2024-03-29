@@ -1,7 +1,14 @@
 package dao;
 
 import data.BoardData;
+import domain.piece.Bishop;
+import domain.piece.Color;
+import domain.piece.King;
+import domain.piece.Knight;
+import domain.piece.Pawn;
 import domain.piece.Piece;
+import domain.piece.Queen;
+import domain.piece.Rook;
 import domain.position.Position;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,8 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import view.mapper.PieceOutput;
 
 public class BoardDao {
 
@@ -36,10 +43,12 @@ public class BoardDao {
     public int save(Position position, Piece piece) {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("INSERT INTO board(file_column, rank_row, piece) VALUES(?, ?, ?)");
-            preparedStatement.setInt(1, position.file());
+                    .prepareStatement(
+                            "INSERT INTO board(file_column, rank_row, piece_type, piece_color) VALUES(?, ?, ?, ?)");
+            preparedStatement.setInt(1, position.file()); // TODO: 여기서는 getter 를 써도 무방한가?
             preparedStatement.setInt(2, position.rank());
-            preparedStatement.setString(3, PieceOutput.asOutput(piece));
+            preparedStatement.setString(3, PieceType.asType(piece));
+            preparedStatement.setString(4, PieceColor.asColor(piece));
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -55,8 +64,9 @@ public class BoardDao {
             while (resultSet.next()) {
                 int fileColumn = resultSet.getInt("file_column");
                 int rankRow = resultSet.getInt("rank_row");
-                String piece = resultSet.getString("piece");
-                boards.add(new BoardData(fileColumn, rankRow, piece));
+                String pieceType = resultSet.getString("piece_type");
+                String pieceColor = resultSet.getString("piece_color");
+                boards.add(new BoardData(fileColumn, rankRow, pieceType, pieceColor));
             }
             return boards;
         } catch (SQLException e) {
@@ -70,6 +80,56 @@ public class BoardDao {
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private enum PieceType {
+
+        BISHOP(Bishop.class, "bishop"),
+        ROOK(Rook.class, "rook"),
+        QUEEN(Queen.class, "queen"),
+        KING(King.class, "king"),
+        KNIGHT(Knight.class, "knight"),
+        PAWN(Pawn.class, "pawn"),
+        ;
+
+        private final Class<? extends Piece> type;
+        private final String dataOutput;
+
+        PieceType(Class<? extends Piece> type, String dataOutput) {
+            this.type = type;
+            this.dataOutput = dataOutput;
+        }
+
+        public static String asType(Piece piece) {
+            return Arrays.stream(values())
+                    .filter(pieceType -> pieceType.type == piece.getClass())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
+                    .dataOutput;
+        }
+    }
+
+    private enum PieceColor {
+
+        WHITE(Color.WHITE, "white"),
+        BLACK(Color.BLACK, "black"),
+        ;
+
+        private final Color color;
+        private final String dataOutput;
+
+        PieceColor(Color color, String dataOutput) {
+            this.color = color;
+            this.dataOutput = dataOutput;
+        }
+
+        public static String asColor(Piece piece) {
+            return Arrays.stream(values())
+                    .filter(pieceType -> pieceType.color == piece.color())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
+                    .dataOutput;
         }
     }
 }

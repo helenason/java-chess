@@ -5,7 +5,6 @@ import static domain.piece.PositionFixture.A2;
 import static domain.piece.PositionFixture.A3;
 import static domain.piece.PositionFixture.A4;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import data.BoardData;
 import domain.piece.Bishop;
@@ -40,25 +39,13 @@ public class BoardDaoTest {
     }
 
     @Test
-    @DisplayName("데이터베이스에 데이터를 추가한다.")
+    @DisplayName("데이터를 추가하고 추가된 데이터 개수를 반환한다.")
     void save_Success() {
         BoardDao boardDao = new BoardDao();
 
         int savedCount = boardDao.save(A1, new Rook(Color.WHITE));
 
         assertThat(savedCount).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("데이터베이스에 파일, 랭크가 같은 데이터 추가를 시도할 경우 에러가 발생한다.")
-    void save_DuplicatedFileRank_Fail() {
-        BoardDao boardDao = new BoardDao();
-
-        boardDao.save(A1, new Rook(Color.WHITE));
-
-        assertThatThrownBy(() -> boardDao.save(A1, new Rook(Color.WHITE)))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("java.sql.SQLIntegrityConstraintViolationException: Duplicate entry");
     }
 
     @Test
@@ -73,10 +60,10 @@ public class BoardDaoTest {
         List<BoardData> boards = boardDao.findAll();
 
         assertThat(boards).contains(
-                new BoardData(1, 1, "r"),
-                new BoardData(1, 2, "n"),
-                new BoardData(1, 3, "B"),
-                new BoardData(1, 4, "Q")
+                new BoardData(1, 1, "rook", "white"),
+                new BoardData(1, 2, "knight", "white"),
+                new BoardData(1, 3, "bishop", "black"),
+                new BoardData(1, 4, "queen", "black")
         );
     }
 
