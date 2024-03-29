@@ -10,6 +10,8 @@ import data.BoardData;
 import domain.piece.Bishop;
 import domain.piece.Color;
 import domain.piece.Knight;
+import domain.piece.None;
+import domain.piece.Piece;
 import domain.piece.Queen;
 import domain.piece.Rook;
 import java.sql.Connection;
@@ -49,6 +51,28 @@ public class BoardDaoTest {
     }
 
     @Test
+    @DisplayName("해당 위치에 기물이 있는 경우 기물을 Optional로 감싸 반환한다.")
+    void findByPosition_Success() {
+        BoardDao boardDao = new BoardDao();
+        Piece expected = new Rook(Color.WHITE);
+        boardDao.save(A1, expected);
+
+        Piece actual = boardDao.findByPosition(A1).orElseGet(() -> new None(Color.NONE));
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("해당 위치에 기물이 없는 경우 빈 Optional을 반환한다.")
+    void findByPosition_Success_Empty() {
+        BoardDao boardDao = new BoardDao();
+
+        boolean actual = boardDao.findByPosition(A1).isEmpty();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
     @DisplayName("저장된 모든 데이터를 반환한다.")
     void findAll_Success() {
         BoardDao boardDao = new BoardDao();
@@ -65,6 +89,31 @@ public class BoardDaoTest {
                 new BoardData(1, 3, "bishop", "black"),
                 new BoardData(1, 4, "queen", "black")
         );
+    }
+
+    @Test
+    @DisplayName("데이터를 수정하고 수정된 데이터 개수를 반환한다.")
+    void update_Success() {
+        BoardDao boardDao = new BoardDao();
+
+        boardDao.save(A1, new Rook(Color.WHITE));
+        int updatedCount = boardDao.update(A1, new Knight(Color.BLACK));
+
+        assertThat(updatedCount).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("데이터를 수정하고 수정된 데이터를 확인한다.")
+    void update_Success_Check() {
+        BoardDao boardDao = new BoardDao();
+        Piece before = new Rook(Color.WHITE);
+        Piece after = new Knight(Color.BLACK);
+        boardDao.save(A1, before);
+
+        boardDao.update(A1, after);
+
+        assertThat(boardDao.findByPosition(A1).orElseGet(() -> new None(Color.NONE)))
+                .isEqualTo(after);
     }
 
     @Test

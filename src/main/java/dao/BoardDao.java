@@ -11,6 +11,8 @@ import domain.piece.Piece;
 import domain.piece.Queen;
 import domain.piece.Rook;
 import domain.position.Position;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,6 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class BoardDao {
 
@@ -56,6 +59,29 @@ public class BoardDao {
         }
     }
 
+    public Optional<Piece> findByPosition(Position position) {
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT * FROM board WHERE file_column = ? and rank_row = ?");
+            preparedStatement.setInt(1, position.file());
+            preparedStatement.setInt(2, position.rank());
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String pieceType = resultSet.getString("piece_type");
+                String pieceColor = resultSet.getString("piece_color");
+                Class<? extends Piece> type = PieceType.asType(pieceType); // TODO: 괜찮은 방법인지 체크 (첫 사용이라서)
+                Constructor<? extends Piece> constructor = type.getConstructor(Color.class);
+                Color color = PieceColor.asColor(pieceColor);
+                return Optional.of(constructor.newInstance(color));
+            }
+            return Optional.empty();
+        } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<BoardData> findAll() {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM board");
@@ -70,6 +96,20 @@ public class BoardDao {
                 boards.add(new BoardData(fileColumn, rankRow, pieceType, pieceColor));
             }
             return boards;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int update(Position position, Piece piece) {
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "UPDATE board SET piece_type = ?, piece_color = ? WHERE file_column = ? and rank_row = ?");
+            preparedStatement.setString(1, PieceType.asData(piece));
+            preparedStatement.setString(2, PieceColor.asData(piece));
+            preparedStatement.setInt(3, position.file());
+            preparedStatement.setInt(4, position.rank());
+            return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -103,12 +143,20 @@ public class BoardDao {
             this.dataOutput = dataOutput;
         }
 
-        public static String asData(Piece piece) {
+        private static String asData(Piece piece) {
             return Arrays.stream(values())
                     .filter(pieceType -> pieceType.type == piece.getClass())
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
                     .dataOutput;
+        }
+
+        private static Class<? extends Piece> asType(String dataOutput) {
+            return Arrays.stream(values())
+                    .filter(pieceType -> pieceType.dataOutput.equals(dataOutput))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
+                    .type;
         }
     }
 
@@ -127,12 +175,20 @@ public class BoardDao {
             this.dataOutput = dataOutput;
         }
 
-        public static String asData(Piece piece) {
+        private static String asData(Piece piece) {
             return Arrays.stream(values())
                     .filter(pieceType -> pieceType.color == piece.color())
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
                     .dataOutput;
+        }
+
+        private static Color asColor(String dataOutput) {
+            return Arrays.stream(values())
+                    .filter(pieceType -> pieceType.dataOutput.equals(dataOutput))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
+                    .color;
         }
     }
 }
