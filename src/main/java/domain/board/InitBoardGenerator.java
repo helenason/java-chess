@@ -1,5 +1,6 @@
 package domain.board;
 
+import dao.BoardDao;
 import domain.piece.Bishop;
 import domain.piece.Color;
 import domain.piece.King;
@@ -23,8 +24,9 @@ public class InitBoardGenerator implements BoardGenerator {
 
     @Override
     public Map<Position, Piece> generate() {
-        Map<Position, Piece> squares = new HashMap<>();
+        deleteData();
 
+        Map<Position, Piece> squares = new HashMap<>();
         initPiece(PiecePosition.PAWN, Pawn::new, squares);
         initPiece(PiecePosition.ROOK, Rook::new, squares);
         initPiece(PiecePosition.KNIGHT, Knight::new, squares);
@@ -32,7 +34,6 @@ public class InitBoardGenerator implements BoardGenerator {
         initPiece(PiecePosition.QUEEN, Queen::new, squares);
         initPiece(PiecePosition.KING, King::new, squares);
         initPiece(PiecePosition.NONE, None::new, squares);
-
         return squares;
     }
 
@@ -43,7 +44,18 @@ public class InitBoardGenerator implements BoardGenerator {
             Color color = ColorPosition.asColor(initPosition);
             Piece piece = makePiece.apply(color);
             squares.put(initPosition, piece);
+            saveData(initPosition, piece);
         }
+    }
+
+    private void deleteData() {
+        BoardDao boardDao = new BoardDao();
+        boardDao.deleteAll();
+    }
+
+    private void saveData(Position position, Piece piece) {
+        BoardDao boardDao = new BoardDao();
+        boardDao.save(position, piece);
     }
 
     private enum PiecePosition {

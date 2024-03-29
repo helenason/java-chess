@@ -5,6 +5,7 @@ import domain.piece.Bishop;
 import domain.piece.Color;
 import domain.piece.King;
 import domain.piece.Knight;
+import domain.piece.None;
 import domain.piece.Pawn;
 import domain.piece.Piece;
 import domain.piece.Queen;
@@ -47,8 +48,8 @@ public class BoardDao {
                             "INSERT INTO board(file_column, rank_row, piece_type, piece_color) VALUES(?, ?, ?, ?)");
             preparedStatement.setInt(1, position.file()); // TODO: 여기서는 getter 를 써도 무방한가?
             preparedStatement.setInt(2, position.rank());
-            preparedStatement.setString(3, PieceType.asType(piece));
-            preparedStatement.setString(4, PieceColor.asColor(piece));
+            preparedStatement.setString(3, PieceType.asData(piece));
+            preparedStatement.setString(4, PieceColor.asData(piece));
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -91,6 +92,7 @@ public class BoardDao {
         KING(King.class, "king"),
         KNIGHT(Knight.class, "knight"),
         PAWN(Pawn.class, "pawn"),
+        NONE(None.class, "none"),
         ;
 
         private final Class<? extends Piece> type;
@@ -101,7 +103,7 @@ public class BoardDao {
             this.dataOutput = dataOutput;
         }
 
-        public static String asType(Piece piece) {
+        public static String asData(Piece piece) {
             return Arrays.stream(values())
                     .filter(pieceType -> pieceType.type == piece.getClass())
                     .findFirst()
@@ -114,6 +116,7 @@ public class BoardDao {
 
         WHITE(Color.WHITE, "white"),
         BLACK(Color.BLACK, "black"),
+        NONE(Color.NONE, "none"),
         ;
 
         private final Color color;
@@ -124,7 +127,7 @@ public class BoardDao {
             this.dataOutput = dataOutput;
         }
 
-        public static String asColor(Piece piece) {
+        public static String asData(Piece piece) {
             return Arrays.stream(values())
                     .filter(pieceType -> pieceType.color == piece.color())
                     .findFirst()
