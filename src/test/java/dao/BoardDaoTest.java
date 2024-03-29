@@ -59,7 +59,7 @@ public class BoardDaoTest {
 
         List<BoardData> boards = boardDao.findAll();
 
-        assertThat(boards).contains(
+        assertThat(boards).containsExactly(
                 new BoardData(1, 1, "rook", "white"),
                 new BoardData(1, 2, "knight", "white"),
                 new BoardData(1, 3, "bishop", "black"),
@@ -76,5 +76,6 @@ public class BoardDaoTest {
         boardDao.save(A2, new Knight(Color.WHITE));
 
         assertThat(boardDao.deleteAll()).isEqualTo(2);
+        assertThat(boardDao.findAll()).hasSize(0);
     }
 }
