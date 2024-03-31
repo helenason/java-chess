@@ -13,7 +13,7 @@ public class TurnTest {
     void next_opposite() {
         Turn turn = new Turn(Color.WHITE);
 
-        Turn actual = turn.next();
+        Turn actual = turn.opponent();
         Turn expected = new Turn(Color.BLACK);
         assertThat(actual).isEqualTo(expected);
     }

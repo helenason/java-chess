@@ -11,7 +11,7 @@ public class Turn {
         this.color = color;
     }
 
-    public Turn next() {
+    public Turn opponent() {
         return new Turn(color.oppositeColor());
     }
 

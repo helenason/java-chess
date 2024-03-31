@@ -1,5 +1,6 @@
 package domain;
 
+import dao.GameDao;
 import domain.board.Board;
 import domain.board.Turn;
 import domain.piece.Color;
@@ -16,13 +17,17 @@ public class Chess {
     private static final int KING_COUNT = 2;
 
     private final Board board;
-    private final ScoreCalculator scoreCalculator;
-    private Turn turn;
+    private final ScoreCalculator scoreCalculator; // TODO: 변수 개수 줄이기
+    private final GameDao gameDao;
 
     public Chess() {
         this.board = Board.create();
-        this.turn = new Turn(Color.WHITE);
         this.scoreCalculator = new ScoreCalculator();
+        this.gameDao = new GameDao();
+        if (gameDao.countGames() == 0) {
+            Turn firstTurn = new Turn(Color.WHITE);
+            gameDao.save(firstTurn);
+        }
     }
 
     public void tryMove(Position sourcePosition, Position targetPosition) {
@@ -38,6 +43,7 @@ public class Chess {
     private void validateMovement(Position sourcePosition, Position targetPosition) {
         validate(sourcePosition.equals(targetPosition), "[ERROR] 제자리에 있을 수 없습니다.");
 
+        Turn turn = gameDao.findTurnById().orElseGet(() -> new Turn(Color.NONE));
         Piece sourcePiece = board.findPieceByPosition(sourcePosition);
         Piece targetPiece = board.findPieceByPosition(targetPosition);
         validate(sourcePiece.isBlank(), "[ERROR] 출발지에 기물이 없어 이동하지 못했습니다.");
@@ -66,7 +72,8 @@ public class Chess {
 
     private void move(Position sourcePosition, Position targetPosition) {
         board.movePiece(sourcePosition, targetPosition);
-        turn = turn.next();
+        Turn turn = gameDao.findTurnById().orElseGet(() -> new Turn(Color.NONE));
+        gameDao.update(turn.opponent());
     }
 
     private void validate(boolean condition, String errorMessage) {
@@ -80,9 +87,10 @@ public class Chess {
     }
 
     public ChessResult judge() {
+        Turn turn = gameDao.findTurnById().orElseGet(() -> new Turn(Color.NONE));
         Map<Color, Double> score = new HashMap<>();
         double own = scoreCalculator.calculate(board, turn);
-        double opponent = scoreCalculator.calculate(board, turn.next());
+        double opponent = scoreCalculator.calculate(board, turn.opponent());
 
         if (turn.isWhite()) {
             score.put(Color.WHITE, own);
@@ -113,6 +121,6 @@ public class Chess {
     }
 
     public Turn getTurn() {
-        return turn;
+        return gameDao.findTurnById().orElseGet(() -> new Turn(Color.NONE));
     }
 }

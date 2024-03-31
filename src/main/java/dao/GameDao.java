@@ -22,7 +22,7 @@ public class GameDao {
     private int gameId;
 
     public GameDao() {
-        this.gameId = 0;
+        this.gameId = findId();
     }
 
     public Connection getConnection() {
@@ -35,6 +35,19 @@ public class GameDao {
             System.out.printf("DB 연결 오류: %s\n", e.getMessage());
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private int findId() {
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM game");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("game_id");
+            }
+            return 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -54,7 +67,20 @@ public class GameDao {
         }
     }
 
-    public Optional<Color> findTurnById() {
+    public int countGames() {
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT COUNT(*) FROM game");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+            return 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Optional<Turn> findTurnById() {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT * FROM game WHERE game_id = ?");
@@ -62,7 +88,8 @@ public class GameDao {
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 String rawTurn = resultSet.getString("turn");
-                return Optional.of(TurnColor.asColor(rawTurn));
+                Turn turn = new Turn(TurnColor.asColor(rawTurn));
+                return Optional.of(turn);
             }
             return Optional.empty();
         } catch (SQLException e) {

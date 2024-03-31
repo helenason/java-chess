@@ -33,6 +33,8 @@ public class BoardTest {
 
     @BeforeEach
     void setUp() {
+        BoardDao boardDao = new BoardDao();
+        boardDao.deleteAll();
         board = Board.create();
     }
 
@@ -164,11 +166,9 @@ public class BoardTest {
     @Test
     @DisplayName("보드에 남아있는 킹의 개수가 1개이다.")
     void countKing_One_False() {
-        board = Board.create(() -> {
-            BoardDao boardDao = new BoardDao();
-            boardDao.deleteAll();
-            boardDao.save(A1, new King(Color.BLACK));
-        });
+        BoardDao boardDao = new BoardDao();
+        boardDao.deleteAll();
+        boardDao.save(A1, new King(Color.BLACK));
 
         int countKing = board.countKing();
 
@@ -178,10 +178,8 @@ public class BoardTest {
     @Test
     @DisplayName("보드에 남아있는 킹의 개수가 0개이다.")
     void countKings_No_False() {
-        board = Board.create(() -> {
-            BoardDao boardDao = new BoardDao();
-            boardDao.deleteAll();
-        });
+        BoardDao boardDao = new BoardDao();
+        boardDao.deleteAll();
 
         int countKing = board.countKing();
 

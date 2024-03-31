@@ -24,6 +24,8 @@ public class ScoreCalculatorTest {
 
     @BeforeEach
     void setUp() {
+        BoardDao boardDao = new BoardDao();
+        boardDao.deleteAll();
         scoreCalculator = new ScoreCalculator();
     }
 

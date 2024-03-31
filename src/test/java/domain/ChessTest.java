@@ -37,6 +37,8 @@ import static domain.piece.PositionFixture.H6;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import dao.BoardDao;
+import dao.GameDao;
 import domain.piece.Color;
 import domain.result.ChessResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +51,10 @@ public class ChessTest {
 
     @BeforeEach
     void setUp() {
+        BoardDao boardDao = new BoardDao();
+        boardDao.deleteAll();
+        GameDao gameDao = new GameDao();
+        gameDao.deleteAll();
         chess = new Chess();
     }
 

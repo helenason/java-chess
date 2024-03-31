@@ -42,12 +42,8 @@ public class InitBoardGenerator implements BoardGenerator {
         for (Position initPosition : initPositions) {
             Color color = ColorPosition.asColor(initPosition);
             Piece piece = makePiece.apply(color);
-            saveData(initPosition, piece);
+            boardDao.save(initPosition, piece);
         }
-    }
-
-    private void saveData(Position position, Piece piece) {
-        boardDao.save(position, piece);
     }
 
     private enum PiecePosition {

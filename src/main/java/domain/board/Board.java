@@ -16,7 +16,6 @@ import java.util.Map;
 
 public class Board {
 
-    private static final int SQUARE_COUNT = 64;
     private static final BoardDao boardDao = new BoardDao();
 
     private Board() {
@@ -34,7 +33,7 @@ public class Board {
     } // TODO: 오직 테스트만을 위한 메서드?
 
     private static boolean isBoardNotExist() {
-        return boardDao.countAll() != SQUARE_COUNT;
+        return boardDao.countAll() == 0;
     }
 
     public void reset() {

@@ -42,7 +42,7 @@ public class GameDaoTest {
     void findTurnById_Success() {
         gameDao.save(new Turn(Color.WHITE));
 
-        Color turn = gameDao.findTurnById().orElse(Color.NONE);
+        Turn turn = gameDao.findTurnById().orElseGet(() -> new Turn(Color.NONE));
 
         assertThat(turn.isWhite()).isTrue();
     }

@@ -42,6 +42,7 @@ import domain.piece.Rook;
 import domain.position.File;
 import domain.position.PositionGenerator;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -50,6 +51,12 @@ import org.junit.jupiter.params.provider.EnumSource;
 class InitBoardGeneratorTest {
 
     private final BoardDao boardDao = new BoardDao();
+
+    @BeforeEach
+    void setUp() {
+        BoardDao boardDao = new BoardDao();
+        boardDao.deleteAll();
+    }
 
     @Test
     @DisplayName("64개의 칸을 생성한다.")
