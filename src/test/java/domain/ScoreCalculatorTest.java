@@ -12,12 +12,8 @@ import domain.piece.Color;
 import domain.piece.King;
 import domain.piece.Knight;
 import domain.piece.Pawn;
-import domain.piece.Piece;
 import domain.piece.Queen;
 import domain.piece.Rook;
-import domain.position.Position;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,10 +55,7 @@ public class ScoreCalculatorTest {
         Board board = Board.create(() -> {
             BoardDao boardDao = new BoardDao();
             boardDao.deleteAll();
-            Map<Position, Piece> squares = new HashMap<>();
-            squares.put(A1, new Queen(Color.WHITE));
             boardDao.save(A1, new Queen(Color.WHITE));
-            return squares;
         });
 
         Turn turn = new Turn(Color.WHITE);
@@ -78,10 +71,7 @@ public class ScoreCalculatorTest {
         Board board = Board.create(() -> {
             BoardDao boardDao = new BoardDao();
             boardDao.deleteAll();
-            Map<Position, Piece> squares = new HashMap<>();
-            squares.put(A1, new Rook(Color.WHITE));
             boardDao.save(A1, new Rook(Color.WHITE));
-            return squares;
         });
 
         Turn turn = new Turn(Color.WHITE);
@@ -97,10 +87,7 @@ public class ScoreCalculatorTest {
         Board board = Board.create(() -> {
             BoardDao boardDao = new BoardDao();
             boardDao.deleteAll();
-            Map<Position, Piece> squares = new HashMap<>();
-            squares.put(A1, new Bishop(Color.WHITE));
             boardDao.save(A1, new Bishop(Color.WHITE));
-            return squares;
         });
 
         Turn turn = new Turn(Color.WHITE);
@@ -116,10 +103,7 @@ public class ScoreCalculatorTest {
         Board board = Board.create(() -> {
             BoardDao boardDao = new BoardDao();
             boardDao.deleteAll();
-            Map<Position, Piece> squares = new HashMap<>();
-            squares.put(A1, new Knight(Color.WHITE));
             boardDao.save(A1, new Knight(Color.WHITE));
-            return squares;
         });
 
         Turn turn = new Turn(Color.WHITE);
@@ -135,10 +119,7 @@ public class ScoreCalculatorTest {
         Board board = Board.create(() -> {
             BoardDao boardDao = new BoardDao();
             boardDao.deleteAll();
-            Map<Position, Piece> squares = new HashMap<>();
-            squares.put(A1, new King(Color.WHITE));
             boardDao.save(A1, new King(Color.WHITE));
-            return squares;
         });
 
         Turn turn = new Turn(Color.WHITE);
@@ -154,10 +135,7 @@ public class ScoreCalculatorTest {
         Board board = Board.create(() -> {
             BoardDao boardDao = new BoardDao();
             boardDao.deleteAll();
-            Map<Position, Piece> squares = new HashMap<>();
-            squares.put(A1, new Pawn(Color.WHITE));
             boardDao.save(A1, new Pawn(Color.WHITE));
-            return squares;
         });
 
         Turn turn = new Turn(Color.WHITE);
@@ -183,12 +161,8 @@ public class ScoreCalculatorTest {
         Board board = Board.create(() -> {
             BoardDao boardDao = new BoardDao();
             boardDao.deleteAll();
-            Map<Position, Piece> squares = new HashMap<>();
-            squares.put(A1, new Pawn(Color.WHITE));
-            squares.put(A2, new Pawn(Color.WHITE));
             boardDao.save(A1, new Pawn(Color.WHITE));
             boardDao.save(A2, new Pawn(Color.WHITE));
-            return squares;
         });
 
         Turn turn = new Turn(Color.WHITE);

@@ -18,7 +18,7 @@ public class Board {
 
     private final BoardDao boardDao;
 
-    private Board(Map<Position, Piece> squares) {
+    private Board() {
         this.boardDao = new BoardDao();
     }
 
@@ -27,8 +27,8 @@ public class Board {
     }
 
     public static Board create(BoardGenerator boardGenerator) {
-        Map<Position, Piece> squares = boardGenerator.generate();
-        return new Board(squares);
+        boardGenerator.generate();
+        return new Board();
     } // TODO: 오직 테스트만을 위한 메서드?
 
     public Piece findPieceByPosition(File file, Rank rank) {

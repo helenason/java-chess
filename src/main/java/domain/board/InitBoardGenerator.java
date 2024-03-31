@@ -15,46 +15,44 @@ import domain.position.Position;
 import domain.position.PositionGenerator;
 import domain.position.Rank;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public class InitBoardGenerator implements BoardGenerator {
 
-    @Override
-    public Map<Position, Piece> generate() {
-        deleteData();
+    private final BoardDao boardDao;
 
-        Map<Position, Piece> squares = new HashMap<>();
-        initPiece(PiecePosition.PAWN, Pawn::new, squares);
-        initPiece(PiecePosition.ROOK, Rook::new, squares);
-        initPiece(PiecePosition.KNIGHT, Knight::new, squares);
-        initPiece(PiecePosition.BISHOP, Bishop::new, squares);
-        initPiece(PiecePosition.QUEEN, Queen::new, squares);
-        initPiece(PiecePosition.KING, King::new, squares);
-        initPiece(PiecePosition.NONE, None::new, squares);
-        return squares;
+    public InitBoardGenerator() {
+        this.boardDao = new BoardDao();
     }
 
-    private void initPiece(PiecePosition piecePosition, Function<Color, Piece> makePiece,
-                           Map<Position, Piece> squares) {
+    @Override
+    public void generate() {
+        deleteData();
+
+        initPiece(PiecePosition.PAWN, Pawn::new);
+        initPiece(PiecePosition.ROOK, Rook::new);
+        initPiece(PiecePosition.KNIGHT, Knight::new);
+        initPiece(PiecePosition.BISHOP, Bishop::new);
+        initPiece(PiecePosition.QUEEN, Queen::new);
+        initPiece(PiecePosition.KING, King::new);
+        initPiece(PiecePosition.NONE, None::new);
+    }
+
+    private void initPiece(PiecePosition piecePosition, Function<Color, Piece> makePiece) {
         List<Position> initPositions = piecePosition.initPositions();
         for (Position initPosition : initPositions) {
             Color color = ColorPosition.asColor(initPosition);
             Piece piece = makePiece.apply(color);
-            squares.put(initPosition, piece);
             saveData(initPosition, piece);
         }
     }
 
     private void deleteData() {
-        BoardDao boardDao = new BoardDao();
         boardDao.deleteAll();
     }
 
     private void saveData(Position position, Piece piece) {
-        BoardDao boardDao = new BoardDao();
         boardDao.save(position, piece);
     }
 

@@ -22,7 +22,6 @@ import domain.position.File;
 import domain.position.Position;
 import domain.position.PositionGenerator;
 import domain.position.Rank;
-import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -168,10 +167,7 @@ public class BoardTest {
         board = Board.create(() -> {
             BoardDao boardDao = new BoardDao();
             boardDao.deleteAll();
-            Map<Position, Piece> squares = new HashMap<>();
-            squares.put(A1, new King(Color.BLACK));
             boardDao.save(A1, new King(Color.BLACK));
-            return squares;
         });
 
         int countKing = board.countKing();
@@ -185,7 +181,6 @@ public class BoardTest {
         board = Board.create(() -> {
             BoardDao boardDao = new BoardDao();
             boardDao.deleteAll();
-            return new HashMap<>();
         });
 
         int countKing = board.countKing();
