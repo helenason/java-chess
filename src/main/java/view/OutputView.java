@@ -10,6 +10,7 @@ import domain.result.ChessResult;
 import java.util.Arrays;
 import java.util.List;
 import view.mapper.PieceOutput;
+import view.mapper.output.ColorOutput;
 
 public class OutputView {
 
@@ -51,37 +52,36 @@ public class OutputView {
         System.out.println();
     }
 
-    public void printTurn(Turn turn) { // TODO: TurnOutput enum 클래스 활용하여 리팩토링
-        if (turn.isBlack()) {
-            System.out.println("블랙(대문자) 진영의 차례입니다.");
-        }
-        if (turn.isWhite()) {
-            System.out.println("화이트(소문자) 진영의 차례입니다.");
-        }
+    public void printTurn(Turn turn) {
+        String colorOutput = ColorOutput.asOutput(turn);
+        System.out.printf("%s 진영의 차례입니다.\n", colorOutput);
     }
 
     public void printError(String errorMessage) {
         System.out.println(errorMessage);
     }
 
-    public void printResult(ChessResult result) { // TODO: TurnOutput enum 클래스 활용하여 리팩토링
+    public void printResult(ChessResult result) {
         System.out.println("\n> 체스 게임을 종료합니다.\n");
-        System.out.println("=== 게임 점수 ===");
-
-        System.out.printf("화이트(소문자) 진영: %1.1f\n", result.getWhiteScore());
-        System.out.printf("블랙(대문자) 진영: %1.1f\n", result.getBlackScore());
+        printScore(result);
         System.out.println();
+        printWinner(result);
+    }
 
+    private void printScore(ChessResult result) {
+        System.out.println("=== 게임 점수 ===");
+        System.out.printf("%s 진영: %1.1f\n", ColorOutput.WHITE.output(), result.getWhiteScore());
+        System.out.printf("%s 진영: %1.1f\n", ColorOutput.BLACK.output(), result.getBlackScore());
+    }
+
+    private void printWinner(ChessResult result) {
         System.out.println("=== 게임 결과 ===");
         Color winner = result.findWinner();
-        if (winner.isWhite()) {
-            System.out.println("우승자는 화이트(소문자) 진영입니다.");
+        if (winner.isNone()) {
+            System.out.println("무승부입니다.");
             return;
         }
-        if (winner.isBlack()) {
-            System.out.println("우승자는 블랙(대문자) 진영입니다.");
-            return;
-        }
-        System.out.println("무승부입니다.");
+        String colorOutput = ColorOutput.asOutput(winner);
+        System.out.printf("우승자는 %s 진영입니다.\n", colorOutput);
     }
 }

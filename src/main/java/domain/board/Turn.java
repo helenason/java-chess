@@ -19,6 +19,10 @@ public class Turn {
         return this.color != color;
     }
 
+    public boolean hasColor(Color color) {
+        return this.color == color;
+    }
+
     public boolean isBlack() {
         return color.isBlack();
     }
