@@ -1,4 +1,4 @@
-package view.mapper;
+package view.mapper.input;
 
 import domain.position.Rank;
 import java.util.Arrays;

@@ -9,8 +9,8 @@ import domain.position.Rank;
 import domain.result.ChessResult;
 import java.util.Arrays;
 import java.util.List;
-import view.mapper.PieceOutput;
 import view.mapper.output.ColorOutput;
+import view.mapper.output.PieceOutput;
 
 public class OutputView {
 

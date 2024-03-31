@@ -4,7 +4,7 @@ import controller.Command;
 import domain.position.Position;
 import domain.position.PositionGenerator;
 import java.util.Scanner;
-import view.mapper.CommandInput;
+import view.mapper.input.CommandInput;
 
 public class InputView {
 

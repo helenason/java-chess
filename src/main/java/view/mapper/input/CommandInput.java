@@ -1,4 +1,4 @@
-package view.mapper;
+package view.mapper.input;
 
 import controller.Command;
 import java.util.Arrays;

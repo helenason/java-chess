@@ -1,4 +1,4 @@
-package view.mapper;
+package view.mapper.output;
 
 import domain.piece.Bishop;
 import domain.piece.King;

@@ -2,8 +2,8 @@ package domain.position;
 
 import java.util.HashMap;
 import java.util.Map;
-import view.mapper.FileInput;
-import view.mapper.RankInput;
+import view.mapper.input.FileInput;
+import view.mapper.input.RankInput;
 
 public class PositionGenerator {
 
