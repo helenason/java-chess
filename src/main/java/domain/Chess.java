@@ -17,12 +17,10 @@ public class Chess {
     private static final int KING_COUNT = 2;
 
     private final Board board;
-    private final ScoreCalculator scoreCalculator; // TODO: 변수 개수 줄이기
     private final GameDao gameDao;
 
     public Chess() {
         this.board = Board.create();
-        this.scoreCalculator = new ScoreCalculator();
         this.gameDao = new GameDao();
         if (gameDao.countGames() == 0) {
             Turn firstTurn = new Turn(Color.WHITE);
@@ -87,6 +85,7 @@ public class Chess {
     }
 
     public ChessResult judge() {
+        ScoreCalculator scoreCalculator = new ScoreCalculator();
         Turn turn = gameDao.findTurnById().orElseGet(() -> new Turn(Color.NONE));
         Map<Color, Double> score = new HashMap<>();
         double own = scoreCalculator.calculate(board, turn);
