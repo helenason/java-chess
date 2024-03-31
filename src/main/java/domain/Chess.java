@@ -103,6 +103,10 @@ public class Chess {
         return new ChessResult(score, Color.NONE);
     }
 
+    public void reset() {
+        board.reset();
+    }
+
     public Board getBoard() {
         return board;
     }

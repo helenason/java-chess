@@ -41,6 +41,7 @@ public class GameManager {
         if (!chess.canContinue()) {
             ChessResult result = chess.judge();
             outputView.printResult(result);
+            chess.reset();
         }
     }
 
@@ -54,6 +55,7 @@ public class GameManager {
         outputView.printTurn(chess.getTurn());
         Command command = requestCommand();
         if (command.isEnd()) {
+            chess.reset();
             return false;
         }
         if (command.isStart()) {

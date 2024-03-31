@@ -16,10 +16,10 @@ import java.util.Map;
 
 public class Board {
 
-    private final BoardDao boardDao;
+    private static final int SQUARE_COUNT = 64;
+    private static final BoardDao boardDao = new BoardDao();
 
     private Board() {
-        this.boardDao = new BoardDao();
     }
 
     public static Board create() {
@@ -27,9 +27,19 @@ public class Board {
     }
 
     public static Board create(BoardGenerator boardGenerator) {
-        boardGenerator.generate();
+        if (isBoardNotExist()) {
+            boardGenerator.generate();
+        }
         return new Board();
     } // TODO: 오직 테스트만을 위한 메서드?
+
+    private static boolean isBoardNotExist() {
+        return boardDao.countAll() != SQUARE_COUNT;
+    }
+
+    public void reset() {
+        boardDao.deleteAll();
+    }
 
     public Piece findPieceByPosition(File file, Rank rank) {
         return findPieceByPosition(PositionGenerator.generate(file, rank));

@@ -28,8 +28,6 @@ public class InitBoardGenerator implements BoardGenerator {
 
     @Override
     public void generate() {
-        deleteData();
-
         initPiece(PiecePosition.PAWN, Pawn::new);
         initPiece(PiecePosition.ROOK, Rook::new);
         initPiece(PiecePosition.KNIGHT, Knight::new);
@@ -46,10 +44,6 @@ public class InitBoardGenerator implements BoardGenerator {
             Piece piece = makePiece.apply(color);
             saveData(initPosition, piece);
         }
-    }
-
-    private void deleteData() {
-        boardDao.deleteAll();
     }
 
     private void saveData(Position position, Piece piece) {

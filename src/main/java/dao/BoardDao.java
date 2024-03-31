@@ -59,6 +59,19 @@ public class BoardDao {
         }
     }
 
+    public int countAll() {
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT COUNT(*) FROM board");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return Integer.parseInt(resultSet.getString(1));
+            }
+            return 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public int countPiece(Class<? extends Piece> pieceType) {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
