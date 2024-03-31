@@ -86,4 +86,9 @@ public class Board {
         BoardDao boardDao = new BoardDao();
         return boardDao.countPiece(King.class);
     }
+
+    public List<Piece> findKings() {
+        BoardDao boardDao = new BoardDao();
+        return boardDao.findPiecesByType(King.class);
+    }
 }

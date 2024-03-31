@@ -74,6 +74,27 @@ public class BoardDao {
         }
     }
 
+    public List<Piece> findPiecesByType(Class<? extends Piece> pieceType) {
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT * FROM board WHERE piece_type = ?");
+            preparedStatement.setString(1, PieceType.asData(pieceType));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Piece> pieces = new ArrayList<>();
+            while (resultSet.next()) {
+                String pieceColor = resultSet.getString("piece_color");
+                Color color = PieceColor.asColor(pieceColor);
+                Constructor<? extends Piece> constructor = pieceType.getConstructor(Color.class);
+                Piece piece = constructor.newInstance(color);
+                pieces.add(piece);
+            }
+            return pieces;
+        } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<Piece> findPiecesByFile(File file) {
         try (Connection connection = getConnection()) {
             List<Piece> pieces = new ArrayList<>();

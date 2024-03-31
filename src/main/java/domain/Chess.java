@@ -6,6 +6,9 @@ import domain.piece.Color;
 import domain.piece.Piece;
 import domain.position.Position;
 import domain.result.ChessResult;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Chess {
 
@@ -76,13 +79,28 @@ public class Chess {
     }
 
     public ChessResult judge() {
+        Map<Color, Double> score = new HashMap<>();
         double own = scoreCalculator.calculate(board, turn);
         double opponent = scoreCalculator.calculate(board, turn.next());
 
         if (turn.isWhite()) {
-            return new ChessResult(own, opponent);
+            score.put(Color.WHITE, own);
+            score.put(Color.BLACK, opponent);
+            if (board.countKing() == 1) {
+                List<Piece> aliveKings = board.findKings();
+                Piece aliveKing = aliveKings.get(0);
+                return new ChessResult(score, aliveKing.color().oppositeColor());
+            }
+            return new ChessResult(score, Color.NONE);
         }
-        return new ChessResult(opponent, own);
+        score.put(Color.BLACK, own);
+        score.put(Color.WHITE, opponent);
+        if (board.countKing() == 1) {
+            List<Piece> aliveKings = board.findKings();
+            Piece aliveKing = aliveKings.get(0);
+            return new ChessResult(score, aliveKing.color().oppositeColor());
+        }
+        return new ChessResult(score, Color.NONE);
     }
 
     public Board getBoard() {

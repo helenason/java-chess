@@ -9,9 +9,36 @@ import static domain.piece.PositionFixture.A6;
 import static domain.piece.PositionFixture.A7;
 import static domain.piece.PositionFixture.B2;
 import static domain.piece.PositionFixture.B4;
+import static domain.piece.PositionFixture.C2;
+import static domain.piece.PositionFixture.C4;
+import static domain.piece.PositionFixture.C5;
+import static domain.piece.PositionFixture.C7;
+import static domain.piece.PositionFixture.D1;
 import static domain.piece.PositionFixture.D4;
+import static domain.piece.PositionFixture.D8;
+import static domain.piece.PositionFixture.E1;
+import static domain.piece.PositionFixture.E2;
+import static domain.piece.PositionFixture.E3;
+import static domain.piece.PositionFixture.E5;
+import static domain.piece.PositionFixture.E7;
+import static domain.piece.PositionFixture.E8;
+import static domain.piece.PositionFixture.F2;
+import static domain.piece.PositionFixture.F3;
+import static domain.piece.PositionFixture.F6;
+import static domain.piece.PositionFixture.F7;
+import static domain.piece.PositionFixture.G2;
+import static domain.piece.PositionFixture.G4;
+import static domain.piece.PositionFixture.G8;
+import static domain.piece.PositionFixture.H2;
+import static domain.piece.PositionFixture.H3;
+import static domain.piece.PositionFixture.H4;
+import static domain.piece.PositionFixture.H5;
+import static domain.piece.PositionFixture.H6;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import domain.piece.Color;
+import domain.result.ChessResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -105,5 +132,76 @@ public class ChessTest {
         assertThatThrownBy(() -> chess.tryMove(A4, A5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("[ERROR] 도착지에 기물이 있어 움직일 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("보드에 화이트 킹이 없는 경우 블랙이 승리한다.")
+    void judge_NoWhiteKing_BlackWin() {
+        chess.tryMove(F2, F3);
+        chess.tryMove(E7, E5);
+        chess.tryMove(G2, G4);
+        chess.tryMove(D8, H4);
+        chess.tryMove(H2, H3);
+        chess.tryMove(H4, E1);
+
+        ChessResult result = chess.judge();
+
+        Color winner = result.findWinner();
+        assertThat(winner).isEqualTo(Color.BLACK);
+    }
+
+    @Test
+    @DisplayName("보드에 블랙 킹이 없는 경우 화이트가 승리한다.")
+    void judge_NoBlackKing_WhiteWin() {
+        chess.tryMove(E2, E3);
+        chess.tryMove(F7, F6);
+        chess.tryMove(D1, H5);
+        chess.tryMove(G8, H6);
+        chess.tryMove(H5, E8);
+
+        ChessResult result = chess.judge();
+
+        Color winner = result.findWinner();
+        assertThat(winner).isEqualTo(Color.WHITE);
+    }
+
+    @Test
+    @DisplayName("보드에 킹이 모두 있고 화이트 진영 점수가 높다면 화이트가 승리한다.")
+    void judge_WhiteScoreIsHigher_WhiteWin() {
+        chess.tryMove(C2, C4);
+        chess.tryMove(C7, C5);
+        chess.tryMove(D1, A4);
+        chess.tryMove(D8, A5);
+        chess.tryMove(A4, A5);
+
+        ChessResult result = chess.judge();
+
+        Color winner = result.findWinner();
+        assertThat(winner).isEqualTo(Color.WHITE);
+    }
+
+    @Test
+    @DisplayName("보드에 킹이 모두 있고 블랙 진영 점수가 높다면 블랙이 승리한다.")
+    void judge_BlackScoreIsHigher_BlackWin() {
+        chess.tryMove(C2, C4);
+        chess.tryMove(C7, C5);
+        chess.tryMove(D1, A4);
+        chess.tryMove(D8, A5);
+        chess.tryMove(H2, H3);
+        chess.tryMove(A5, A4);
+
+        ChessResult result = chess.judge();
+
+        Color winner = result.findWinner();
+        assertThat(winner).isEqualTo(Color.BLACK);
+    }
+
+    @Test
+    @DisplayName("보드에 킹이 모두 있고 화이트와 블랙 진영의 점수가 같을 경우 무승부이다.")
+    void judge_SameScore_Draw() {
+        ChessResult result = chess.judge();
+
+        Color winner = result.findWinner();
+        assertThat(winner).isEqualTo(Color.NONE);
     }
 }
