@@ -1,6 +1,5 @@
 package dao;
 
-import data.BoardData;
 import domain.piece.Bishop;
 import domain.piece.Color;
 import domain.piece.King;
@@ -12,8 +11,6 @@ import domain.piece.Queen;
 import domain.piece.Rook;
 import domain.position.File;
 import domain.position.Position;
-import domain.position.PositionGenerator;
-import domain.position.Rank;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
@@ -62,7 +59,7 @@ public class BoardDao {
         }
     }
 
-    public List<Piece> findByFile(File file) {
+    public List<Piece> findPiecesByFile(File file) {
         try (Connection connection = getConnection()) {
             List<Piece> pieces = new ArrayList<>();
             PreparedStatement preparedStatement = connection.prepareStatement(
@@ -85,7 +82,7 @@ public class BoardDao {
         }
     }
 
-    public Optional<Piece> findByPosition(Position position) {
+    public Optional<Piece> findPieceByPosition(Position position) {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT * FROM board WHERE file_column = ? and rank_row = ?");
@@ -108,19 +105,13 @@ public class BoardDao {
         }
     }
 
-    public List<BoardData> findAll() { // TODO: BoardData -> Piece & naming
+    public List<Piece> findAllPieces() {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM board");
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            List<BoardData> boards = new ArrayList<>();
+            List<Piece> pieces = new ArrayList<>();
             while (resultSet.next()) {
-                int fileColumn = resultSet.getInt("file_column");
-                int rankRow = resultSet.getInt("rank_row");
-                File file = File.asFile(fileColumn);
-                Rank rank = Rank.asRank(rankRow);
-                Position position = PositionGenerator.generate(file, rank);
-
                 String pieceType = resultSet.getString("piece_type");
                 String pieceColor = resultSet.getString("piece_color");
                 Class<? extends Piece> type = PieceType.asType(pieceType);
@@ -128,9 +119,9 @@ public class BoardDao {
                 Color color = PieceColor.asColor(pieceColor);
                 Piece piece = constructor.newInstance(color);
 
-                boards.add(new BoardData(position, piece));
+                pieces.add(piece);
             }
-            return boards;
+            return pieces;
         } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException |
                  InvocationTargetException e) {
             throw new RuntimeException(e);

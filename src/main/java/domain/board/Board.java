@@ -1,7 +1,6 @@
 package domain.board;
 
 import dao.BoardDao;
-import data.BoardData;
 import domain.piece.Color;
 import domain.piece.None;
 import domain.piece.Piece;
@@ -36,7 +35,7 @@ public class Board {
 
     public Piece findPieceByPosition(Position position) {
         BoardDao boardDao = new BoardDao();
-        return boardDao.findByPosition(position).orElseGet(() -> new None(Color.NONE));
+        return boardDao.findPieceByPosition(position).orElseGet(() -> new None(Color.NONE));
     }
 
     public void movePiece(Position source, Position target) {
@@ -53,16 +52,14 @@ public class Board {
                 .anyMatch(Piece::isNotBlank);
     }
 
-
     public Map<Piece, Integer> findRemainPieces(Color color) {
         Map<Piece, Integer> remainPieces = new HashMap<>();
 
         BoardDao boardDao = new BoardDao();
-        List<BoardData> allPieces = boardDao.findAll();
+        List<Piece> allPieces = boardDao.findAllPieces();
 
         allPieces.stream()
-                .filter(boardData -> boardData.hasColor(color))
-                .map(BoardData::getPiece)
+                .filter(piece -> piece.hasColor(color))
                 .forEach(piece -> {
                     remainPieces.putIfAbsent(piece, 0);
                     remainPieces.computeIfPresent(piece, (key, value) -> value + 1);
@@ -83,14 +80,13 @@ public class Board {
 
     private List<Piece> findPiecesByFile(File file) {
         BoardDao boardDao = new BoardDao();
-        return boardDao.findByFile(file);
+        return boardDao.findPiecesByFile(file);
     }
 
     public boolean checkKingsAlive() {
         BoardDao boardDao = new BoardDao();
-        List<BoardData> boardData = boardDao.findAll();
-        return boardData.stream()
-                .map(BoardData::getPiece)
+        List<Piece> pieces = boardDao.findAllPieces();
+        return pieces.stream()
                 .filter(Piece::isKing)
                 .count() == KING_COUNT;
     }
