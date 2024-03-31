@@ -31,6 +31,10 @@ public class Turn {
         return color.isWhite();
     }
 
+    public Color color() {
+        return color;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
