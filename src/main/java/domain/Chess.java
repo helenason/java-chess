@@ -6,6 +6,7 @@ import domain.piece.Color;
 import domain.piece.Piece;
 import domain.position.Position;
 import domain.result.ChessResult;
+import domain.result.ScoreCalculator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

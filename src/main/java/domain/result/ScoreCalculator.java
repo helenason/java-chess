@@ -1,4 +1,4 @@
-package domain;
+package domain.result;
 
 import domain.board.Board;
 import domain.board.Turn;

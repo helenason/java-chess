@@ -1,4 +1,4 @@
-package domain;
+package domain.result;
 
 import static domain.piece.PositionFixture.A1;
 import static domain.piece.PositionFixture.A2;
