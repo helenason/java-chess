@@ -16,7 +16,10 @@ import java.util.Map;
 
 public class Board {
 
+    private final BoardDao boardDao;
+
     private Board(Map<Position, Piece> squares) {
+        this.boardDao = new BoardDao();
     }
 
     public static Board create() {
@@ -33,13 +36,11 @@ public class Board {
     }
 
     public Piece findPieceByPosition(Position position) {
-        BoardDao boardDao = new BoardDao();
         return boardDao.findPieceByPosition(position).orElseGet(() -> new None(Color.NONE));
     }
 
     public void movePiece(Position source, Position target) {
         Piece sourcePiece = findPieceByPosition(source);
-        BoardDao boardDao = new BoardDao();
         boardDao.update(target, sourcePiece);
         boardDao.update(source, new None(Color.NONE));
     }
@@ -54,7 +55,6 @@ public class Board {
     public Map<Piece, Integer> findRemainPieces(Color color) {
         Map<Piece, Integer> remainPieces = new HashMap<>();
 
-        BoardDao boardDao = new BoardDao();
         List<Piece> allPieces = boardDao.findAllPieces();
 
         allPieces.stream()
@@ -78,17 +78,19 @@ public class Board {
     }
 
     private List<Piece> findPiecesByFile(File file) {
-        BoardDao boardDao = new BoardDao();
         return boardDao.findPiecesByFile(file);
     }
 
+//    public int countKing() {
+//        BoardDao boardDao = new BoardDao();
+//        return boardDao.countPiece(King.class);
+//    }
+
     public int countKing() {
-        BoardDao boardDao = new BoardDao();
-        return boardDao.countPiece(King.class);
+        return boardDao.findPiecesByType(King.class).size();
     }
 
     public List<Piece> findKings() {
-        BoardDao boardDao = new BoardDao();
         return boardDao.findPiecesByType(King.class);
     }
 }
