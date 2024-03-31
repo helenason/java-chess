@@ -15,8 +15,6 @@ import java.util.Map;
 
 public class Board {
 
-    private static final int KING_COUNT = 2;
-
     private Board(Map<Position, Piece> squares) {
     }
 
@@ -83,11 +81,11 @@ public class Board {
         return boardDao.findPiecesByFile(file);
     }
 
-    public boolean checkKingsAlive() {
+    public int countKing() {
         BoardDao boardDao = new BoardDao();
         List<Piece> pieces = boardDao.findAllPieces();
-        return pieces.stream()
+        return (int) pieces.stream()
                 .filter(Piece::isKing)
-                .count() == KING_COUNT;
+                .count();
     }
 }

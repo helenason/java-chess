@@ -155,16 +155,16 @@ public class BoardTest {
     }
 
     @Test
-    @DisplayName("보드에 킹 두 개가 모두 있는 경우 참을 반환한다.")
-    void hasKing_All_True() {
-        boolean hasKing = board.checkKingsAlive();
+    @DisplayName("보드에 남아있는 킹의 개수가 2개이다.")
+    void countKing_All_True() {
+        int countKing = board.countKing();
 
-        assertThat(hasKing).isTrue();
+        assertThat(countKing).isEqualTo(2);
     }
 
     @Test
-    @DisplayName("보드에 킹이 하나 있는 경우 거짓을 반환한다.")
-    void hasKing_One_False() {
+    @DisplayName("보드에 남아있는 킹의 개수가 1개이다.")
+    void countKing_One_False() {
         board = Board.create(() -> {
             BoardDao boardDao = new BoardDao();
             boardDao.deleteAll();
@@ -174,22 +174,22 @@ public class BoardTest {
             return squares;
         });
 
-        boolean hasKing = board.checkKingsAlive();
+        int countKing = board.countKing();
 
-        assertThat(hasKing).isFalse();
+        assertThat(countKing).isEqualTo(1);
     }
 
     @Test
-    @DisplayName("보드에 킹이 없는 경우 거짓을 반환한다.")
-    void hasKing_No_False() {
+    @DisplayName("보드에 남아있는 킹의 개수가 0개이다.")
+    void countKing_No_False() {
         board = Board.create(() -> {
             BoardDao boardDao = new BoardDao();
             boardDao.deleteAll();
             return new HashMap<>();
         });
 
-        boolean hasKing = board.checkKingsAlive();
+        int countKing = board.countKing();
 
-        assertThat(hasKing).isFalse();
+        assertThat(countKing).isEqualTo(0);
     }
 }

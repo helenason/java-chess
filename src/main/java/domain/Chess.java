@@ -9,6 +9,8 @@ import domain.result.ChessResult;
 
 public class Chess {
 
+    private static final int KING_COUNT = 2;
+
     private final Board board;
     private final ScoreCalculator scoreCalculator;
     private Turn turn;
@@ -70,7 +72,7 @@ public class Chess {
     }
 
     public boolean canContinue() {
-        return board.checkKingsAlive();
+        return board.countKing() == KING_COUNT;
     }
 
     public ChessResult judge() {
