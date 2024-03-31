@@ -2,6 +2,7 @@ package domain.board;
 
 import dao.BoardDao;
 import domain.piece.Color;
+import domain.piece.King;
 import domain.piece.None;
 import domain.piece.Piece;
 import domain.position.File;
@@ -83,9 +84,6 @@ public class Board {
 
     public int countKing() {
         BoardDao boardDao = new BoardDao();
-        List<Piece> pieces = boardDao.findAllPieces();
-        return (int) pieces.stream()
-                .filter(Piece::isKing)
-                .count();
+        return boardDao.countPiece(King.class);
     }
 }

@@ -59,6 +59,21 @@ public class BoardDao {
         }
     }
 
+    public int countPiece(Class<? extends Piece> pieceType) {
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT COUNT(*) FROM board WHERE piece_type = ?");
+            preparedStatement.setString(1, PieceType.asData(pieceType));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return Integer.parseInt(resultSet.getString(1));
+            }
+            return 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<Piece> findPiecesByFile(File file) {
         try (Connection connection = getConnection()) {
             List<Piece> pieces = new ArrayList<>();
@@ -173,6 +188,14 @@ public class BoardDao {
         private static String asData(Piece piece) {
             return Arrays.stream(values())
                     .filter(pieceType -> pieceType.type == piece.getClass())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
+                    .dataOutput;
+        }
+
+        private static String asData(Class<? extends Piece> type) {
+            return Arrays.stream(values())
+                    .filter(pieceType -> pieceType.type == type)
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
                     .dataOutput;

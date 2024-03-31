@@ -181,7 +181,7 @@ public class BoardTest {
 
     @Test
     @DisplayName("보드에 남아있는 킹의 개수가 0개이다.")
-    void countKing_No_False() {
+    void countKings_No_False() {
         board = Board.create(() -> {
             BoardDao boardDao = new BoardDao();
             boardDao.deleteAll();
