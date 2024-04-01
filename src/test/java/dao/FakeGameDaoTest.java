@@ -2,39 +2,30 @@ package dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import dao.fake.FakeGameDao;
 import domain.board.Turn;
 import domain.piece.Color;
-import java.sql.Connection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class GameDaoTest {
+public class FakeGameDaoTest {
 
     private GameDao gameDao;
 
     @BeforeEach
     void setUp() {
-        gameDao = new GameDao();
-        gameDao.deleteAll();
+        gameDao = new FakeGameDao();
     }
 
     @Test
-    @DisplayName("데이터베이스 연결에 성공한다.")
-    void getConnection_Success() {
-        Connection connection = gameDao.getConnection();
-
-        assertThat(connection).isNotNull();
-    }
-
-    @Test
-    @DisplayName("데이터를 추가하고 추가된 데이터 개수를 반환한다.")
+    @DisplayName("데이터를 추가하고 추가된 행의 id를 반환한다.")
     void save_Success() {
         Turn turn = new Turn(Color.WHITE);
 
-        int savedCount = gameDao.save(turn);
+        int gameId = gameDao.save(turn);
 
-        assertThat(savedCount).isEqualTo(1);
+        assertThat(gameId).isEqualTo(1);
     }
 
     @Test
@@ -42,7 +33,7 @@ public class GameDaoTest {
     void findTurnById_Success() {
         gameDao.save(new Turn(Color.WHITE));
 
-        Turn turn = gameDao.findTurnById().orElseGet(() -> new Turn(Color.NONE));
+        Turn turn = gameDao.findTurn().orElseGet(() -> new Turn(Color.NONE));
 
         assertThat(turn.isWhite()).isTrue();
     }
@@ -63,7 +54,7 @@ public class GameDaoTest {
     void delete_Success() {
         gameDao.save(new Turn(Color.WHITE));
 
-        int deletedCount = gameDao.deleteById();
+        int deletedCount = gameDao.delete();
 
         assertThat(deletedCount).isEqualTo(1);
     }

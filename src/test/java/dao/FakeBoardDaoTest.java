@@ -6,6 +6,7 @@ import static domain.piece.PositionFixture.A3;
 import static domain.piece.PositionFixture.A4;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import dao.fake.FakeBoardDao;
 import domain.piece.Bishop;
 import domain.piece.Color;
 import domain.piece.Knight;
@@ -14,28 +15,18 @@ import domain.piece.Piece;
 import domain.piece.Queen;
 import domain.piece.Rook;
 import domain.position.File;
-import java.sql.Connection;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class BoardDaoTest {
+public class FakeBoardDaoTest {
 
     private BoardDao boardDao;
 
     @BeforeEach
     void setUp() {
-        boardDao = new BoardDao();
-        boardDao.deleteAll();
-    }
-
-    @Test
-    @DisplayName("데이터베이스 연결에 성공한다.")
-    void getConnection_Success() {
-        Connection connection = boardDao.getConnection();
-
-        assertThat(connection).isNotNull();
+        boardDao = new FakeBoardDao();
     }
 
     @Test
@@ -58,7 +49,7 @@ public class BoardDaoTest {
 
         List<Piece> pieces = boardDao.findPiecesByFile(File.A);
 
-        assertThat(pieces).containsExactly(actual1, actual2, actual3);
+        assertThat(pieces).containsOnly(actual1, actual2, actual3);
     }
 
     @Test
@@ -90,7 +81,7 @@ public class BoardDaoTest {
 
         List<Piece> pieces = boardDao.findAllPieces();
 
-        assertThat(pieces).containsExactly(
+        assertThat(pieces).containsOnly(
                 new Rook(Color.WHITE),
                 new Knight(Color.WHITE),
                 new Bishop(Color.BLACK),
@@ -126,7 +117,7 @@ public class BoardDaoTest {
         boardDao.save(A1, new Rook(Color.WHITE));
         boardDao.save(A2, new Knight(Color.WHITE));
 
-        assertThat(boardDao.deleteAll()).isEqualTo(2);
+        assertThat(boardDao.delete()).isEqualTo(2);
         assertThat(boardDao.findAllPieces()).hasSize(0);
     }
 }

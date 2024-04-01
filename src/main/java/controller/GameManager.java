@@ -1,5 +1,7 @@
 package controller;
 
+import dao.RealBoardDao;
+import dao.RealGameDao;
 import domain.Chess;
 import domain.position.Position;
 import domain.result.ChessResult;
@@ -46,7 +48,7 @@ public class GameManager {
     }
 
     private Chess initChess() {
-        Chess chess = new Chess();
+        Chess chess = new Chess(new RealGameDao(), new RealBoardDao());
         outputView.printBoard(chess.getBoard());
         return chess;
     }

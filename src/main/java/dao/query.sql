@@ -1,7 +1,5 @@
 CREATE TABLE game (
-    game_id INT NOT NULL auto_increment,
-    turn VARCHAR(10) NOT NULL,
-    PRIMARY KEY (game_id)
+    turn VARCHAR(10) NOT NULL
 );
 
 CREATE TABLE board (
@@ -10,7 +8,5 @@ CREATE TABLE board (
     rank_row INT NOT NULL,
     piece_type VARCHAR(10) NOT NULL,
     piece_color VARCHAR(10) NOT NULL,
-    game_id INT NOT NULL,
-	PRIMARY KEY (board_id),
-	FOREIGN KEY (game_id) references game(game_id)
+	PRIMARY KEY (board_id)
 );

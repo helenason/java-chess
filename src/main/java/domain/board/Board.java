@@ -16,28 +16,29 @@ import java.util.Map;
 
 public class Board {
 
-    private static final BoardDao boardDao = new BoardDao();
+    private final BoardDao boardDao;
 
-    private Board() {
+    private Board(BoardDao boardDao) {
+        this.boardDao = boardDao;
     }
 
-    public static Board create() {
-        return create(new InitBoardGenerator());
+    public static Board create(BoardDao boardDao) {
+        return create(boardDao, new InitBoardGenerator(boardDao));
     }
 
-    public static Board create(BoardGenerator boardGenerator) {
-        if (isBoardNotExist()) {
+    public static Board create(BoardDao boardDao, BoardGenerator boardGenerator) {
+        if (isBoardNotExist(boardDao)) {
             boardGenerator.generate();
         }
-        return new Board();
+        return new Board(boardDao);
     } // TODO: 오직 테스트만을 위한 메서드?
 
-    private static boolean isBoardNotExist() {
+    private static boolean isBoardNotExist(BoardDao boardDao) {
         return boardDao.countAll() == 0;
     }
 
     public void reset() {
-        boardDao.deleteAll();
+        boardDao.delete();
     }
 
     public Piece findPieceByPosition(File file, Rank rank) {

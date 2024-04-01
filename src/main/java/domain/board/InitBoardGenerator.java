@@ -22,8 +22,8 @@ public class InitBoardGenerator implements BoardGenerator {
 
     private final BoardDao boardDao;
 
-    public InitBoardGenerator() {
-        this.boardDao = new BoardDao();
+    public InitBoardGenerator(BoardDao boardDao) {
+        this.boardDao = boardDao;
     }
 
     @Override

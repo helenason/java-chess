@@ -1,5 +1,6 @@
 package domain;
 
+import dao.BoardDao;
 import dao.GameDao;
 import domain.board.Board;
 import domain.board.Turn;
@@ -19,13 +20,9 @@ public class Chess {
     private final Board board;
     private final GameDao gameDao;
 
-    public Chess() {
-        this.board = Board.create();
-        this.gameDao = new GameDao();
-        if (gameDao.countGames() == 0) {
-            Turn firstTurn = new Turn(Color.WHITE);
-            gameDao.save(firstTurn);
-        }
+    public Chess(GameDao gameDao, BoardDao boardDao) {
+        this.gameDao = gameDao;
+        this.board = Board.create(boardDao);
     }
 
     public void tryMove(Position sourcePosition, Position targetPosition) {
@@ -41,7 +38,7 @@ public class Chess {
     private void validateMovement(Position sourcePosition, Position targetPosition) {
         validate(sourcePosition.equals(targetPosition), "[ERROR] 제자리에 있을 수 없습니다.");
 
-        Turn turn = gameDao.findTurnById().orElseGet(() -> new Turn(Color.NONE));
+        Turn turn = gameDao.findTurn().orElseGet(() -> new Turn(Color.NONE));
         Piece sourcePiece = board.findPieceByPosition(sourcePosition);
         Piece targetPiece = board.findPieceByPosition(targetPosition);
         validate(sourcePiece.isBlank(), "[ERROR] 출발지에 기물이 없어 이동하지 못했습니다.");
@@ -70,7 +67,7 @@ public class Chess {
 
     private void move(Position sourcePosition, Position targetPosition) {
         board.movePiece(sourcePosition, targetPosition);
-        Turn turn = gameDao.findTurnById().orElseGet(() -> new Turn(Color.NONE));
+        Turn turn = gameDao.findTurn().orElseGet(() -> new Turn(Color.NONE));
         gameDao.update(turn.opponent());
     }
 
@@ -86,7 +83,7 @@ public class Chess {
 
     public ChessResult judge() {
         ScoreCalculator scoreCalculator = new ScoreCalculator();
-        Turn turn = gameDao.findTurnById().orElseGet(() -> new Turn(Color.NONE));
+        Turn turn = gameDao.findTurn().orElseGet(() -> new Turn(Color.NONE));
         Map<Color, Double> score = new HashMap<>();
         double own = scoreCalculator.calculate(board, turn);
         double opponent = scoreCalculator.calculate(board, turn.opponent());
@@ -120,6 +117,6 @@ public class Chess {
     }
 
     public Turn getTurn() {
-        return gameDao.findTurnById().orElseGet(() -> new Turn(Color.NONE));
+        return gameDao.findTurn().orElseGet(() -> new Turn(Color.NONE));
     }
 }

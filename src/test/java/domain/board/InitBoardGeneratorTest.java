@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import dao.BoardDao;
+import dao.fake.FakeBoardDao;
 import domain.piece.Bishop;
 import domain.piece.Color;
 import domain.piece.King;
@@ -50,20 +51,19 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 class InitBoardGeneratorTest {
 
-    private final BoardDao boardDao = new BoardDao();
+    private BoardGenerator boardGenerator;
+    private BoardDao boardDao;
 
     @BeforeEach
     void setUp() {
-        BoardDao boardDao = new BoardDao();
-        boardDao.deleteAll();
+        boardDao = new FakeBoardDao();
+        boardGenerator = new InitBoardGenerator(boardDao);
     }
 
     @Test
     @DisplayName("64개의 칸을 생성한다.")
     void generate_SquaresSize() {
-        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
-
-        initBoardGenerator.generate();
+        boardGenerator.generate();
 
         List<Piece> pieces = boardDao.findAllPieces();
         assertThat(pieces).hasSize(64);
@@ -72,8 +72,7 @@ class InitBoardGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 폰은 A2 B2 C2 D2 E2 F2 G2 H2에 위치한다.")
     void generate_Pawn() {
-        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
-        initBoardGenerator.generate();
+        boardGenerator.generate();
 
         Piece actual1 = boardDao.findPieceByPosition(A2).orElseGet(() -> new None(Color.NONE));
         Piece actual2 = boardDao.findPieceByPosition(B2).orElseGet(() -> new None(Color.NONE));
@@ -99,8 +98,7 @@ class InitBoardGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 룩은 A1 A8 H1 H8에 위치한다.")
     void generate_Rook() {
-        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
-        initBoardGenerator.generate();
+        boardGenerator.generate();
 
         Piece actual1 = boardDao.findPieceByPosition(A1).orElseGet(() -> new None(Color.NONE));
         Piece actual2 = boardDao.findPieceByPosition(A8).orElseGet(() -> new None(Color.NONE));
@@ -118,8 +116,7 @@ class InitBoardGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 나이트는 B1 B8 G1 G8에 위치한다.")
     void generate_Knight() {
-        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
-        initBoardGenerator.generate();
+        boardGenerator.generate();
 
         Piece actual1 = boardDao.findPieceByPosition(B1).orElseGet(() -> new None(Color.NONE));
         Piece actual2 = boardDao.findPieceByPosition(B8).orElseGet(() -> new None(Color.NONE));
@@ -137,8 +134,7 @@ class InitBoardGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 비숍은 C1 C8 F1 F8에 위치한다.")
     void generate_Bishop() {
-        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
-        initBoardGenerator.generate();
+        boardGenerator.generate();
 
         Piece actual1 = boardDao.findPieceByPosition(C1).orElseGet(() -> new None(Color.NONE));
         Piece actual2 = boardDao.findPieceByPosition(C8).orElseGet(() -> new None(Color.NONE));
@@ -156,8 +152,7 @@ class InitBoardGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 퀸은 D1 D8에 위치한다.")
     void generate_Queen() {
-        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
-        initBoardGenerator.generate();
+        boardGenerator.generate();
 
         Piece actual1 = boardDao.findPieceByPosition(D1).orElseGet(() -> new None(Color.NONE));
         Piece actual2 = boardDao.findPieceByPosition(D8).orElseGet(() -> new None(Color.NONE));
@@ -171,8 +166,7 @@ class InitBoardGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 킹은 E1 E8에 위치한다.")
     void generate_King() {
-        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
-        initBoardGenerator.generate();
+        boardGenerator.generate();
 
         Piece actual1 = boardDao.findPieceByPosition(E1).orElseGet(() -> new None(Color.NONE));
         Piece actual2 = boardDao.findPieceByPosition(E8).orElseGet(() -> new None(Color.NONE));
@@ -187,8 +181,7 @@ class InitBoardGeneratorTest {
     @EnumSource(names = {"A", "B", "C", "D", "E", "F", "G", "H"})
     @DisplayName("게임 시작 시 랭크 3, 4, 5, 6은 비어있다.")
     void generate_None(File file) {
-        InitBoardGenerator initBoardGenerator = new InitBoardGenerator();
-        initBoardGenerator.generate();
+        boardGenerator.generate();
 
         Piece actual1 = boardDao.findPieceByPosition(PositionGenerator.generate(file, THREE))
                 .orElseGet(() -> new None(Color.NONE));

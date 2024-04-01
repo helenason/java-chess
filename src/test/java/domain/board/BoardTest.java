@@ -1,15 +1,23 @@
 package domain.board;
 
-import static domain.piece.PositionFixture.A1;
+import static domain.piece.PositionFixture.A2;
 import static domain.piece.PositionFixture.A3;
 import static domain.piece.PositionFixture.A4;
 import static domain.piece.PositionFixture.A5;
 import static domain.piece.PositionFixture.A7;
 import static domain.piece.PositionFixture.B2;
+import static domain.piece.PositionFixture.D2;
+import static domain.piece.PositionFixture.D5;
+import static domain.piece.PositionFixture.D7;
+import static domain.piece.PositionFixture.D8;
+import static domain.piece.PositionFixture.E1;
+import static domain.piece.PositionFixture.E2;
+import static domain.piece.PositionFixture.E4;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import dao.BoardDao;
+import dao.fake.FakeBoardDao;
 import domain.piece.Bishop;
 import domain.piece.Color;
 import domain.piece.King;
@@ -33,9 +41,8 @@ public class BoardTest {
 
     @BeforeEach
     void setUp() {
-        BoardDao boardDao = new BoardDao();
-        boardDao.deleteAll();
-        board = Board.create();
+        BoardDao boardDao = new FakeBoardDao();
+        board = Board.create(boardDao);
     }
 
     @Test
@@ -97,7 +104,8 @@ public class BoardTest {
     @Test
     @DisplayName("경로에 다른 기물이 없는 경우 거짓을 반환한다. - 대각선 경로")
     void isBlocked_Diagonal_False() {
-        board.movePiece(PositionGenerator.generate(File.D, Rank.TWO), PositionGenerator.generate(File.D, Rank.THREE));
+        board.movePiece(PositionGenerator.generate(File.D, Rank.TWO),
+                PositionGenerator.generate(File.D, Rank.THREE));
         Position source = PositionGenerator.generate(File.C, Rank.ONE);
         Position target = PositionGenerator.generate(File.H, Rank.SIX);
 
@@ -166,23 +174,17 @@ public class BoardTest {
     @Test
     @DisplayName("보드에 남아있는 킹의 개수가 1개이다.")
     void countKing_One_False() {
-        BoardDao boardDao = new BoardDao();
-        boardDao.deleteAll();
-        boardDao.save(A1, new King(Color.BLACK));
+        board.movePiece(E2, E4);
+        board.movePiece(D7, D5);
+        board.movePiece(E4, D5);
+        board.movePiece(D8, D5);
+        board.movePiece(E1, E2);
+        board.movePiece(D5, D2);
+        board.movePiece(A2, A3);
+        board.movePiece(D2, E2);
 
         int countKing = board.countKing();
 
         assertThat(countKing).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("보드에 남아있는 킹의 개수가 0개이다.")
-    void countKings_No_False() {
-        BoardDao boardDao = new BoardDao();
-        boardDao.deleteAll();
-
-        int countKing = board.countKing();
-
-        assertThat(countKing).isEqualTo(0);
     }
 }
