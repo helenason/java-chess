@@ -64,7 +64,6 @@ public class OutputView {
     public void printResult(ChessResult result) {
         System.out.println("\n> 체스 게임을 종료합니다.\n");
         printScore(result);
-        System.out.println();
         printWinner(result);
     }
 
@@ -72,6 +71,7 @@ public class OutputView {
         System.out.println("=== 게임 점수 ===");
         System.out.printf("%s 진영: %1.1f\n", ColorOutput.WHITE.output(), result.getWhiteScore());
         System.out.printf("%s 진영: %1.1f\n", ColorOutput.BLACK.output(), result.getBlackScore());
+        System.out.println();
     }
 
     private void printWinner(ChessResult result) {

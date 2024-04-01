@@ -37,9 +37,15 @@ public class GameManager {
 
     private void playGame() {
         Chess chess = initChess();
-        while (chess.canContinue() && wantMove(chess)) {
-            tryMoveUntilNoError(chess);
-        }
+        Command command;
+        do {
+            outputView.printTurn(chess.getTurn());
+            command = requestCommand();
+            if (command.isMove()) { // TODO: 들여쓰기 줄이기
+                tryMoveUntilNoError(chess);
+            }
+        } while (chess.canContinue() && wantContinue(chess, command));
+
         ChessResult result = chess.judge();
         outputView.printResult(result);
         chess.reset();
@@ -51,23 +57,15 @@ public class GameManager {
         return chess;
     }
 
-    private boolean wantMove(Chess chess) {
-        outputView.printTurn(chess.getTurn());
-        Command command = requestCommand();
-        if (command.isEnd()) {
-            return false;
-        }
+    private boolean wantContinue(Chess chess, Command command) {
         if (command.isStart()) {
             playGame();
-            return false;
         }
         if (command.isStatus()) {
             ChessResult result = chess.judge();
             outputView.printScore(result);
-            return true;
-            // TODO: status 후 계속 게임 진행되도록
         }
-        return true; // TODO: if문 리팩토링
+        return command.wantContinue();
     }
 
     private Command requestCommand() {
