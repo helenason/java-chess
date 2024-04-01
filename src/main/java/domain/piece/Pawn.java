@@ -10,6 +10,7 @@ import static domain.position.Direction.UP;
 import domain.position.Direction;
 import domain.position.Position;
 import domain.position.Rank;
+import domain.result.Score;
 import java.util.Set;
 
 public class Pawn extends Piece {
@@ -24,7 +25,7 @@ public class Pawn extends Piece {
     private static final int TWO_STEP = 2;
 
     public Pawn(Color color) {
-        super(color);
+        super(color, new Score(1));
     }
 
     @Override

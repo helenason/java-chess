@@ -1,6 +1,7 @@
 package domain.piece;
 
 import domain.position.Position;
+import domain.result.Score;
 
 public class Knight extends Piece {
 
@@ -8,7 +9,7 @@ public class Knight extends Piece {
     private static final int TWO_STEP = 2;
 
     public Knight(Color color) {
-        super(color);
+        super(color, new Score(2.5));
     }
 
     @Override

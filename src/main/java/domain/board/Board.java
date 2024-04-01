@@ -4,6 +4,7 @@ import dao.BoardDao;
 import domain.piece.Color;
 import domain.piece.King;
 import domain.piece.None;
+import domain.piece.Pawn;
 import domain.piece.Piece;
 import domain.position.File;
 import domain.position.Position;
@@ -76,9 +77,9 @@ public class Board {
         return remainPieces;
     }
 
-    public boolean hasSameColorPawnAtSameFile(Color color) { // TODO: check naming
+    public boolean hasSameColorPawnAtSameFile(Pawn pawn) {
         return Arrays.stream(File.values())
-                .anyMatch(file -> countPawnByFileAndColor(file, color) > 1);
+                .anyMatch(file -> countPawnByFileAndColor(file, pawn.color()) > 1);
     }
 
     private long countPawnByFileAndColor(File file, Color color) {
@@ -90,11 +91,6 @@ public class Board {
     private List<Piece> findPiecesByFile(File file) {
         return boardDao.findPiecesByFile(file);
     }
-
-//    public int countKing() {
-//        BoardDao boardDao = new BoardDao();
-//        return boardDao.countPiece(King.class);
-//    }
 
     public int countKing() {
         return boardDao.findPiecesByType(King.class).size();

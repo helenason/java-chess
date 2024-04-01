@@ -2,6 +2,7 @@ package domain.piece;
 
 import domain.position.Direction;
 import domain.position.Position;
+import domain.result.Score;
 import java.util.Set;
 
 public class King extends Piece {
@@ -11,7 +12,7 @@ public class King extends Piece {
     private static final int ONE_STEP = 1;
 
     public King(Color color) {
-        super(color);
+        super(color, new Score(0));
     }
 
     @Override

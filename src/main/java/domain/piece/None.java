@@ -1,11 +1,12 @@
 package domain.piece;
 
 import domain.position.Position;
+import domain.result.Score;
 
 public class None extends Piece {
 
     public None(Color color) {
-        super(color);
+        super(color, new Score(0));
     }
 
     @Override

@@ -7,6 +7,7 @@ import static domain.position.Direction.RIGHT_UP;
 
 import domain.position.Direction;
 import domain.position.Position;
+import domain.result.Score;
 import java.util.Set;
 
 public class Bishop extends Piece {
@@ -14,7 +15,7 @@ public class Bishop extends Piece {
     private static final Set<Direction> VALID_DIRECTIONS = Set.of(RIGHT_UP, RIGHT_DOWN, LEFT_UP, LEFT_DOWN);
 
     public Bishop(Color color) {
-        super(color);
+        super(color, new Score(3));
     }
 
     @Override

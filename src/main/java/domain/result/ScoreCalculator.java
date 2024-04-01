@@ -2,54 +2,40 @@ package domain.result;
 
 import domain.board.Board;
 import domain.board.Turn;
-import domain.piece.Bishop;
 import domain.piece.Color;
-import domain.piece.King;
-import domain.piece.Knight;
 import domain.piece.Pawn;
 import domain.piece.Piece;
-import domain.piece.Queen;
-import domain.piece.Rook;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ScoreCalculator {
 
-    private static final Map<Piece, Double> score;
-
-    static {
-        score = new HashMap<>();
-        score.put(new Queen(Color.WHITE), 9D);
-        score.put(new Rook(Color.WHITE), 5D);
-        score.put(new Bishop(Color.WHITE), 3D);
-        score.put(new Knight(Color.WHITE), 2.5);
-        score.put(new Pawn(Color.WHITE), 1D);
-        score.put(new King(Color.WHITE), 0D);
-        score.put(new Queen(Color.BLACK), 9D);
-        score.put(new Rook(Color.BLACK), 5D);
-        score.put(new Bishop(Color.BLACK), 3D);
-        score.put(new Knight(Color.BLACK), 2.5);
-        score.put(new Pawn(Color.BLACK), 1D);
-        score.put(new King(Color.BLACK), 0D); // TODO: 색을 나누어 구별하는 방식 리팩토링
-    }
-
     public double calculate(Board board, Turn turn) {
         Color color = decideColor(turn);
         Map<Piece, Integer> remainPieces = board.findRemainPieces(color);
-        double notPawnScore = remainPieces.entrySet().stream()
-                .filter(entry -> entry.getKey().isNotPawn())
-                .mapToDouble(entry -> score.getOrDefault(entry.getKey(), 0D) * entry.getValue())
-                .sum();
+        double totalScoreExceptPawn = scoreExceptPawn(remainPieces);
+
         Pawn pawn = new Pawn(color);
         if (!remainPieces.containsKey(pawn)) {
-            return notPawnScore;
+            return totalScoreExceptPawn;
         }
-        boolean hasSameColorPawnAtSameFile = board.hasSameColorPawnAtSameFile(color);
-        double pawnScore = remainPieces.get(pawn) * score.get(pawn);
-        if (hasSameColorPawnAtSameFile && remainPieces.containsKey(pawn)) {
-            return notPawnScore + pawnScore * 0.5;
+        int pawnCount = remainPieces.get(pawn);
+        double totalScoreOfPawn = scoreOfPawn(board, pawnCount, pawn);
+        return totalScoreExceptPawn + totalScoreOfPawn;
+    }
+
+    private double scoreOfPawn(Board board, int pawnCount, Pawn pawn) {
+        double score = pawn.calculateScore(pawnCount);
+        if (board.hasSameColorPawnAtSameFile(pawn)) {
+            return score * 0.5;
         }
-        return notPawnScore + pawnScore;
+        return score;
+    }
+
+    private double scoreExceptPawn(Map<Piece, Integer> remainPieces) {
+        return remainPieces.entrySet().stream()
+                .filter(entry -> entry.getKey().isNotPawn())
+                .mapToDouble(entry -> entry.getKey().calculateScore(entry.getValue()))
+                .sum();
     }
 
     private Color decideColor(Turn turn) {

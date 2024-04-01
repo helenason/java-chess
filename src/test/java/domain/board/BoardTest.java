@@ -152,14 +152,14 @@ public class BoardTest {
         board.movePiece(A4, A3);
         board.movePiece(B2, A3);
 
-        boolean hasSameColorPawnAtSameFile = board.hasSameColorPawnAtSameFile(Color.WHITE);
+        boolean hasSameColorPawnAtSameFile = board.hasSameColorPawnAtSameFile(new Pawn(Color.WHITE));
         assertThat(hasSameColorPawnAtSameFile).isTrue();
     }
 
     @Test
     @DisplayName("같은 세로줄(파일)에 같은 색 폰이 없는 경우 거짓을 반환한다.")
     void hasSameColorPawnAtSameFile_False() {
-        boolean hasSameColorPawnAtSameFile = board.hasSameColorPawnAtSameFile(Color.WHITE);
+        boolean hasSameColorPawnAtSameFile = board.hasSameColorPawnAtSameFile(new Pawn(Color.WHITE));
         assertThat(hasSameColorPawnAtSameFile).isFalse();
     }
 

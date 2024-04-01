@@ -2,6 +2,7 @@ package domain.piece;
 
 import domain.position.Direction;
 import domain.position.Position;
+import domain.result.Score;
 import java.util.Set;
 
 public class Queen extends Piece {
@@ -9,7 +10,7 @@ public class Queen extends Piece {
     private static final Set<Direction> VALID_DIRECTIONS = Direction.allDirections();
 
     public Queen(Color color) {
-        super(color);
+        super(color, new Score(9));
     }
 
     @Override
