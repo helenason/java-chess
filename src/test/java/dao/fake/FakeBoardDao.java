@@ -4,7 +4,6 @@ import dao.BoardDao;
 import domain.piece.Piece;
 import domain.position.File;
 import domain.position.Position;
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +12,6 @@ import java.util.Optional;
 public class FakeBoardDao implements BoardDao {
 
     private final Map<Position, Piece> squares = new HashMap<>();
-
-    @Override
-    public Connection getConnection() {
-        return null;
-    }
 
     @Override
     public int save(Position position, Piece piece) {

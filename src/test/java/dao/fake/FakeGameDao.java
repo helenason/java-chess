@@ -2,7 +2,6 @@ package dao.fake;
 
 import dao.GameDao;
 import domain.board.Turn;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,11 +9,6 @@ import java.util.Optional;
 public class FakeGameDao implements GameDao {
 
     private final List<Turn> turns = new ArrayList<>();
-
-    @Override
-    public Connection getConnection() {
-        return null;
-    }
 
     @Override
     public int save(Turn turn) {

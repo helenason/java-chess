@@ -3,13 +3,10 @@ package dao;
 import domain.piece.Piece;
 import domain.position.File;
 import domain.position.Position;
-import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
 public interface BoardDao {
-
-    Connection getConnection();
 
     int save(Position position, Piece piece);
 

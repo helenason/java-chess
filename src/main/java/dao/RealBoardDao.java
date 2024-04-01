@@ -14,7 +14,6 @@ import domain.position.Position;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,27 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class RealBoardDao implements BoardDao {
-
-    private static final String SERVER = "localhost:3306";
-    private static final String DATABASE = "chess";
-    private static final String OPTION = "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "password";
-
-    @Override
-    public Connection getConnection() {
-        try {
-            return DriverManager.getConnection(
-                    String.format("jdbc:mysql://%s/%s%s", SERVER, DATABASE, OPTION),
-                    USERNAME,
-                    PASSWORD);
-        } catch (SQLException e) {
-            System.out.printf("DB 연결 오류: %s\n", e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
+public class RealBoardDao extends DaoConnection implements BoardDao {
 
     @Override
     public int save(Position position, Piece piece) {

@@ -3,34 +3,13 @@ package dao;
 import domain.board.Turn;
 import domain.piece.Color;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class RealGameDao implements GameDao {
-
-    private static final String SERVER = "localhost:3306";
-    private static final String DATABASE = "chess";
-    private static final String OPTION = "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "password";
-
-    @Override
-    public Connection getConnection() {
-        try {
-            return DriverManager.getConnection(
-                    String.format("jdbc:mysql://%s/%s%s", SERVER, DATABASE, OPTION),
-                    USERNAME,
-                    PASSWORD);
-        } catch (SQLException e) {
-            System.out.printf("DB 연결 오류: %s\n", e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
+public class RealGameDao extends DaoConnection implements GameDao {
 
     @Override
     public int save(Turn turn) {
