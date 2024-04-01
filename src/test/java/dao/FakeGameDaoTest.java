@@ -19,7 +19,7 @@ public class FakeGameDaoTest {
     }
 
     @Test
-    @DisplayName("데이터를 추가하고 추가된 행의 id를 반환한다.")
+    @DisplayName("데이터를 추가하고 추가된 행의 개수를 반환한다.")
     void save_Success() {
         Turn turn = new Turn(Color.WHITE);
 

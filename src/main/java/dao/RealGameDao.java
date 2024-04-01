@@ -7,7 +7,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -37,14 +36,9 @@ public class RealGameDao implements GameDao {
     public int save(Turn turn) {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("INSERT INTO game(turn) VALUES(?)", Statement.RETURN_GENERATED_KEYS);
+                    .prepareStatement("INSERT INTO game(turn) VALUES(?)");
             preparedStatement.setString(1, TurnColor.asData(turn));
-            preparedStatement.executeUpdate();
-            ResultSet key = preparedStatement.getGeneratedKeys();
-            if (key.next()) {
-                return key.getInt(1);
-            }
-            return 0;
+            return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

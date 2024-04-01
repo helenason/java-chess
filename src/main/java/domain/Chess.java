@@ -22,6 +22,7 @@ public class Chess {
 
     public Chess(GameDao gameDao, BoardDao boardDao) {
         this.gameDao = gameDao;
+        gameDao.save(new Turn(Color.WHITE));
         this.board = Board.create(boardDao);
     }
 
@@ -110,6 +111,7 @@ public class Chess {
 
     public void reset() {
         board.reset();
+        gameDao.delete();
     }
 
     public Board getBoard() {
