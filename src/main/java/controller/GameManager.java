@@ -40,11 +40,9 @@ public class GameManager {
         while (chess.canContinue() && wantMove(chess)) {
             tryMoveUntilNoError(chess);
         }
-        if (!chess.canContinue()) {
-            ChessResult result = chess.judge();
-            outputView.printResult(result);
-            chess.reset();
-        }
+        ChessResult result = chess.judge();
+        outputView.printResult(result);
+        chess.reset();
     }
 
     private Chess initChess() {
@@ -57,7 +55,6 @@ public class GameManager {
         outputView.printTurn(chess.getTurn());
         Command command = requestCommand();
         if (command.isEnd()) {
-            chess.reset();
             return false;
         }
         if (command.isStart()) {
@@ -67,7 +64,7 @@ public class GameManager {
         if (command.isStatus()) {
             ChessResult result = chess.judge();
             outputView.printResult(result);
-            return false;
+            return true;
         }
         return true; // TODO: if문 리팩토링
     }
