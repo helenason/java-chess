@@ -41,7 +41,6 @@ import dao.BoardDao;
 import dao.GameDao;
 import dao.fake.FakeBoardDao;
 import dao.fake.FakeGameDao;
-import domain.board.Turn;
 import domain.piece.Color;
 import domain.result.ChessResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +54,6 @@ public class ChessTest {
     @BeforeEach
     void setUp() {
         GameDao gameDao = new FakeGameDao();
-        gameDao.save(new Turn(Color.WHITE));
         BoardDao boardDao = new FakeBoardDao();
         chess = new Chess(gameDao, boardDao);
     }
