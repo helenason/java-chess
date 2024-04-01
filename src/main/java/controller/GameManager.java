@@ -63,8 +63,9 @@ public class GameManager {
         }
         if (command.isStatus()) {
             ChessResult result = chess.judge();
-            outputView.printResult(result);
+            outputView.printScore(result);
             return true;
+            // TODO: status 후 계속 게임 진행되도록
         }
         return true; // TODO: if문 리팩토링
     }
