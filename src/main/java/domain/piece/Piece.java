@@ -58,7 +58,7 @@ public abstract class Piece {
     }
 
     public boolean isNotPawn() {
-        return true;
+        return !isPawn();
     }
 
     public boolean isKing() {
