@@ -29,10 +29,7 @@ import static domain.position.Rank.THREE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import dao.BoardDao;
-import dao.fake.FakeBoardDao;
 import domain.piece.Bishop;
-import domain.piece.Color;
 import domain.piece.King;
 import domain.piece.Knight;
 import domain.piece.None;
@@ -41,8 +38,9 @@ import domain.piece.Piece;
 import domain.piece.Queen;
 import domain.piece.Rook;
 import domain.position.File;
+import domain.position.Position;
 import domain.position.PositionGenerator;
-import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,37 +50,33 @@ import org.junit.jupiter.params.provider.EnumSource;
 class InitBoardGeneratorTest {
 
     private BoardGenerator boardGenerator;
-    private BoardDao boardDao;
 
     @BeforeEach
     void setUp() {
-        boardDao = new FakeBoardDao();
-        boardGenerator = new InitBoardGenerator(boardDao);
+        boardGenerator = new InitBoardGenerator();
     }
 
     @Test
     @DisplayName("64개의 칸을 생성한다.")
     void generate_SquaresSize() {
-        boardGenerator.generate();
+        Map<Position, Piece> squares = boardGenerator.generate();
 
-        List<Piece> pieces = boardDao.findAllPieces();
-        assertThat(pieces).hasSize(64);
+        assertThat(squares).hasSize(64);
     }
 
     @Test
     @DisplayName("게임 시작 시 폰은 A2 B2 C2 D2 E2 F2 G2 H2에 위치한다.")
     void generate_Pawn() {
-        boardGenerator.generate();
+        Map<Position, Piece> squares = boardGenerator.generate();
 
-        Piece actual1 = boardDao.findPieceByPosition(A2).orElseGet(() -> new None(Color.NONE));
-        Piece actual2 = boardDao.findPieceByPosition(B2).orElseGet(() -> new None(Color.NONE));
-        Piece actual3 = boardDao.findPieceByPosition(C2).orElseGet(() -> new None(Color.NONE));
-        Piece actual4 = boardDao.findPieceByPosition(D2).orElseGet(() -> new None(Color.NONE));
-        Piece actual5 = boardDao.findPieceByPosition(E2).orElseGet(() -> new None(Color.NONE));
-        Piece actual6 = boardDao.findPieceByPosition(F2).orElseGet(() -> new None(Color.NONE));
-        Piece actual7 = boardDao.findPieceByPosition(G2).orElseGet(() -> new None(Color.NONE));
-        Piece actual8 = boardDao.findPieceByPosition(H2).orElseGet(() -> new None(Color.NONE));
-
+        Piece actual1 = squares.get(A2);
+        Piece actual2 = squares.get(B2);
+        Piece actual3 = squares.get(C2);
+        Piece actual4 = squares.get(D2);
+        Piece actual5 = squares.get(E2);
+        Piece actual6 = squares.get(F2);
+        Piece actual7 = squares.get(G2);
+        Piece actual8 = squares.get(H2);
         assertAll(() -> {
             assertThat(actual1).isInstanceOf(Pawn.class);
             assertThat(actual2).isInstanceOf(Pawn.class);
@@ -98,13 +92,12 @@ class InitBoardGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 룩은 A1 A8 H1 H8에 위치한다.")
     void generate_Rook() {
-        boardGenerator.generate();
+        Map<Position, Piece> squares = boardGenerator.generate();
 
-        Piece actual1 = boardDao.findPieceByPosition(A1).orElseGet(() -> new None(Color.NONE));
-        Piece actual2 = boardDao.findPieceByPosition(A8).orElseGet(() -> new None(Color.NONE));
-        Piece actual3 = boardDao.findPieceByPosition(A1).orElseGet(() -> new None(Color.NONE));
-        Piece actual4 = boardDao.findPieceByPosition(A8).orElseGet(() -> new None(Color.NONE));
-
+        Piece actual1 = squares.get(A1);
+        Piece actual2 = squares.get(A8);
+        Piece actual3 = squares.get(A1);
+        Piece actual4 = squares.get(A8);
         assertAll(() -> {
             assertThat(actual1).isInstanceOf(Rook.class);
             assertThat(actual2).isInstanceOf(Rook.class);
@@ -116,13 +109,12 @@ class InitBoardGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 나이트는 B1 B8 G1 G8에 위치한다.")
     void generate_Knight() {
-        boardGenerator.generate();
+        Map<Position, Piece> squares = boardGenerator.generate();
 
-        Piece actual1 = boardDao.findPieceByPosition(B1).orElseGet(() -> new None(Color.NONE));
-        Piece actual2 = boardDao.findPieceByPosition(B8).orElseGet(() -> new None(Color.NONE));
-        Piece actual3 = boardDao.findPieceByPosition(G1).orElseGet(() -> new None(Color.NONE));
-        Piece actual4 = boardDao.findPieceByPosition(G8).orElseGet(() -> new None(Color.NONE));
-
+        Piece actual1 = squares.get(B1);
+        Piece actual2 = squares.get(B8);
+        Piece actual3 = squares.get(G1);
+        Piece actual4 = squares.get(G8);
         assertAll(() -> {
             assertThat(actual1).isInstanceOf(Knight.class);
             assertThat(actual2).isInstanceOf(Knight.class);
@@ -134,13 +126,12 @@ class InitBoardGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 비숍은 C1 C8 F1 F8에 위치한다.")
     void generate_Bishop() {
-        boardGenerator.generate();
+        Map<Position, Piece> squares = boardGenerator.generate();
 
-        Piece actual1 = boardDao.findPieceByPosition(C1).orElseGet(() -> new None(Color.NONE));
-        Piece actual2 = boardDao.findPieceByPosition(C8).orElseGet(() -> new None(Color.NONE));
-        Piece actual3 = boardDao.findPieceByPosition(F1).orElseGet(() -> new None(Color.NONE));
-        Piece actual4 = boardDao.findPieceByPosition(F8).orElseGet(() -> new None(Color.NONE));
-
+        Piece actual1 = squares.get(C1);
+        Piece actual2 = squares.get(C8);
+        Piece actual3 = squares.get(F1);
+        Piece actual4 = squares.get(F8);
         assertAll(() -> {
             assertThat(actual1).isInstanceOf(Bishop.class);
             assertThat(actual2).isInstanceOf(Bishop.class);
@@ -152,11 +143,10 @@ class InitBoardGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 퀸은 D1 D8에 위치한다.")
     void generate_Queen() {
-        boardGenerator.generate();
+        Map<Position, Piece> squares = boardGenerator.generate();
 
-        Piece actual1 = boardDao.findPieceByPosition(D1).orElseGet(() -> new None(Color.NONE));
-        Piece actual2 = boardDao.findPieceByPosition(D8).orElseGet(() -> new None(Color.NONE));
-
+        Piece actual1 = squares.get(D1);
+        Piece actual2 = squares.get(D8);
         assertAll(() -> {
             assertThat(actual1).isInstanceOf(Queen.class);
             assertThat(actual2).isInstanceOf(Queen.class);
@@ -166,10 +156,10 @@ class InitBoardGeneratorTest {
     @Test
     @DisplayName("게임 시작 시 킹은 E1 E8에 위치한다.")
     void generate_King() {
-        boardGenerator.generate();
+        Map<Position, Piece> squares = boardGenerator.generate();
 
-        Piece actual1 = boardDao.findPieceByPosition(E1).orElseGet(() -> new None(Color.NONE));
-        Piece actual2 = boardDao.findPieceByPosition(E8).orElseGet(() -> new None(Color.NONE));
+        Piece actual1 = squares.get(E1);
+        Piece actual2 = squares.get(E8);
 
         assertAll(() -> {
             assertThat(actual1).isInstanceOf(King.class);
@@ -181,17 +171,12 @@ class InitBoardGeneratorTest {
     @EnumSource(names = {"A", "B", "C", "D", "E", "F", "G", "H"})
     @DisplayName("게임 시작 시 랭크 3, 4, 5, 6은 비어있다.")
     void generate_None(File file) {
-        boardGenerator.generate();
+        Map<Position, Piece> squares = boardGenerator.generate();
 
-        Piece actual1 = boardDao.findPieceByPosition(PositionGenerator.generate(file, THREE))
-                .orElseGet(() -> new None(Color.NONE));
-        Piece actual2 = boardDao.findPieceByPosition(PositionGenerator.generate(file, FOUR))
-                .orElseGet(() -> new None(Color.NONE));
-        Piece actual3 = boardDao.findPieceByPosition(PositionGenerator.generate(file, FIVE))
-                .orElseGet(() -> new None(Color.NONE));
-        Piece actual4 = boardDao.findPieceByPosition(PositionGenerator.generate(file, SIX))
-                .orElseGet(() -> new None(Color.NONE));
-
+        Piece actual1 = squares.get(PositionGenerator.generate(file, THREE));
+        Piece actual2 = squares.get(PositionGenerator.generate(file, FOUR));
+        Piece actual3 = squares.get(PositionGenerator.generate(file, FIVE));
+        Piece actual4 = squares.get(PositionGenerator.generate(file, SIX));
         assertAll(() -> {
             assertThat(actual1).isInstanceOf(None.class);
             assertThat(actual2).isInstanceOf(None.class);

@@ -2,7 +2,6 @@ package domain.board;
 
 import dao.BoardDao;
 import domain.piece.Color;
-import domain.piece.King;
 import domain.piece.None;
 import domain.piece.Pawn;
 import domain.piece.Piece;
@@ -14,32 +13,36 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class Board {
 
-    private final BoardDao boardDao;
+    // TODO: 도메인과 DAO 분리하기!!
+    private final Map<Position, Piece> squares;
 
-    private Board(BoardDao boardDao) {
-        this.boardDao = boardDao;
+    private Board(Map<Position, Piece> squares) {
+        this.squares = squares;
     }
 
-    public static Board create(BoardDao boardDao) {
-        return create(boardDao, new InitBoardGenerator(boardDao));
+    public static Board create() {
+        return create(new InitBoardGenerator());
     }
 
-    public static Board create(BoardDao boardDao, BoardGenerator boardGenerator) {
-        if (isBoardNotExist(boardDao)) {
-            boardGenerator.generate();
-        }
-        return new Board(boardDao);
+    public static Board create(BoardGenerator boardGenerator) {
+        Map<Position, Piece> squares = boardGenerator.generate();
+        return new Board(squares);
     } // TODO: 오직 테스트만을 위한 메서드?
+
+    public static Board create(Map<Position, Piece> squares) {
+        return new Board(squares);
+    }
 
     private static boolean isBoardNotExist(BoardDao boardDao) {
         return boardDao.countAll() == 0;
     }
 
     public void reset() {
-        boardDao.delete();
+//        boardDao.delete();
     }
 
     public Piece findPieceByPosition(File file, Rank rank) {
@@ -47,13 +50,13 @@ public class Board {
     }
 
     public Piece findPieceByPosition(Position position) {
-        return boardDao.findPieceByPosition(position).orElseGet(() -> new None(Color.NONE));
+        return squares.getOrDefault(position, new None(Color.NONE));
     }
 
     public void movePiece(Position source, Position target) {
         Piece sourcePiece = findPieceByPosition(source);
-        boardDao.update(target, sourcePiece);
-        boardDao.update(source, new None(Color.NONE));
+        squares.replace(target, sourcePiece);
+        squares.replace(source, new None(Color.NONE));
     }
 
     public boolean isBlocked(Position source, Position target) {
@@ -66,7 +69,7 @@ public class Board {
     public Map<Piece, Integer> findRemainPieces(Color color) {
         Map<Piece, Integer> remainPieces = new HashMap<>();
 
-        List<Piece> allPieces = boardDao.findAllPieces();
+        List<Piece> allPieces = squares.values().stream().toList();
 
         allPieces.stream()
                 .filter(piece -> piece.hasColor(color))
@@ -89,14 +92,21 @@ public class Board {
     }
 
     private List<Piece> findPiecesByFile(File file) {
-        return boardDao.findPiecesByFile(file);
+        return squares.entrySet().stream()
+                .filter(entry -> entry.getKey().hasFile(file))
+                .map(Entry::getValue)
+                .toList();
     }
 
     public int countKing() {
-        return boardDao.findPiecesByType(King.class).size();
+        return (int) squares.values().stream()
+                .filter(Piece::isKing)
+                .count();
     }
 
     public List<Piece> findKings() {
-        return boardDao.findPiecesByType(King.class);
+        return squares.values().stream()
+                .filter(Piece::isKing)
+                .toList();
     }
 }

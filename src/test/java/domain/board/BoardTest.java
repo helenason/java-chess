@@ -16,8 +16,6 @@ import static domain.piece.PositionFixture.E4;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import dao.BoardDao;
-import dao.fake.FakeBoardDao;
 import domain.piece.Bishop;
 import domain.piece.Color;
 import domain.piece.King;
@@ -41,8 +39,7 @@ public class BoardTest {
 
     @BeforeEach
     void setUp() {
-        BoardDao boardDao = new FakeBoardDao();
-        board = Board.create(boardDao);
+        board = Board.create();
     }
 
     @Test
