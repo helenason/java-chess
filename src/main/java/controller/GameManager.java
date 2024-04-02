@@ -1,10 +1,17 @@
 package controller;
 
+import dao.BoardDao;
+import dao.GameDao;
 import dao.RealBoardDao;
 import dao.RealGameDao;
 import domain.Chess;
+import domain.board.Board;
+import domain.board.Turn;
+import domain.piece.Color;
+import domain.piece.Piece;
 import domain.position.Position;
 import domain.result.ChessResult;
+import java.util.Map;
 import view.InputView;
 import view.OutputView;
 
@@ -48,13 +55,51 @@ public class GameManager {
 
         ChessResult result = chess.judge();
         outputView.printResult(result);
-        chess.reset();
+        reset();
+    }
+
+    private void reset() {
+        GameDao gameDao = new RealGameDao();
+        gameDao.delete();
+        BoardDao boardDao = new RealBoardDao();
+        boardDao.delete();
     }
 
     private Chess initChess() {
-        Chess chess = new Chess(new RealGameDao(), new RealBoardDao());
+        Board board = createBoard();
+        Turn turn = createTurn();
+        Chess chess = new Chess(board, turn);
         outputView.printBoard(chess.getBoard());
         return chess;
+    }
+
+    private Turn createTurn() {
+        GameDao gameDao = new RealGameDao();
+        if (isGameExist(gameDao)) {
+            return gameDao.findTurn().orElseGet(() -> new Turn(Color.WHITE));
+        }
+        Turn turn = new Turn(Color.WHITE);
+        gameDao.save(turn);
+        return turn;
+    }
+
+    private boolean isGameExist(GameDao gameDao) {
+        return gameDao.countAll() != 0;
+    }
+
+    private Board createBoard() {
+        BoardDao boardDao = new RealBoardDao();
+        if (isBoardExist(boardDao)) {
+            Map<Position, Piece> squares = boardDao.findAllSquares();
+            return Board.create(squares);
+        }
+        Board board = Board.create();
+        boardDao.saveAll(board);
+        return board;
+    }
+
+    private boolean isBoardExist(BoardDao boardDao) {
+        return boardDao.countAll() != 0;
     }
 
     private boolean wantContinue(Chess chess, Command command) {
@@ -92,6 +137,8 @@ public class GameManager {
         Position sourcePosition = inputView.readPosition();
         Position targetPosition = inputView.readPosition();
         chess.tryMove(sourcePosition, targetPosition);
+        GameDao gameDao = new RealGameDao();
+        gameDao.update(chess.getTurn());
         outputView.printBoard(chess.getBoard());
     }
 }

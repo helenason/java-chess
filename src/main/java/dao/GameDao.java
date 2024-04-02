@@ -7,6 +7,8 @@ public interface GameDao {
 
     int save(Turn turn);
 
+    int countAll();
+
     Optional<Turn> findTurn();
 
     int update(Turn turn);

@@ -17,6 +17,11 @@ public class FakeGameDao implements GameDao {
     }
 
     @Override
+    public int countAll() {
+        return turns.size();
+    }
+
+    @Override
     public Optional<Turn> findTurn() {
         if (turns.isEmpty()) {
             return Optional.empty();

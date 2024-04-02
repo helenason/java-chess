@@ -1,5 +1,6 @@
 package dao;
 
+import domain.board.Board;
 import domain.piece.Bishop;
 import domain.piece.Color;
 import domain.piece.King;
@@ -11,6 +12,8 @@ import domain.piece.Queen;
 import domain.piece.Rook;
 import domain.position.File;
 import domain.position.Position;
+import domain.position.PositionGenerator;
+import domain.position.Rank;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
@@ -19,7 +22,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 public class RealBoardDao extends DaoConnection implements BoardDao {
@@ -27,9 +33,8 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
     @Override
     public int save(Position position, Piece piece) {
         try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection
-                    .prepareStatement(
-                            "INSERT INTO board(file_column, rank_row, piece_type, piece_color) VALUES(?, ?, ?, ?)");
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "INSERT INTO board(file_column, rank_row, piece_type, piece_color) VALUES(?, ?, ?, ?)");
             preparedStatement.setInt(1, position.file()); // TODO: 여기서는 getter 를 써도 무방한가?
             preparedStatement.setInt(2, position.rank());
             preparedStatement.setString(3, PieceType.asData(piece));
@@ -38,6 +43,15 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public int saveAll(Board board) {
+        int savedCount = 0;
+        for (Entry<Position, Piece> square : board.getSquares().entrySet()) {
+            savedCount += save(square.getKey(), square.getValue());
+        }
+        return savedCount;
     }
 
     @Override
@@ -104,7 +118,8 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
     @Override
     public List<Piece> findAllPieces() {
         try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM board");
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT * FROM board");
             ResultSet resultSet = preparedStatement.executeQuery();
 
             List<Piece> pieces = new ArrayList<>();
@@ -119,6 +134,36 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
                 pieces.add(piece);
             }
             return pieces;
+        } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Map<Position, Piece> findAllSquares() {
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT * FROM board");
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            Map<Position, Piece> squares = new HashMap<>();
+            while (resultSet.next()) {
+                int fileColumn = resultSet.getInt("file_column");
+                int rankRow = resultSet.getInt("rank_row");
+                File file = File.asFile(fileColumn);
+                Rank rank = Rank.asRank(rankRow);
+
+                String pieceType = resultSet.getString("piece_type");
+                String pieceColor = resultSet.getString("piece_color");
+                Class<? extends Piece> type = PieceType.asType(pieceType);
+                Constructor<? extends Piece> constructor = type.getConstructor(Color.class);
+                Color color = PieceColor.asColor(pieceColor);
+                Piece piece = constructor.newInstance(color);
+
+                squares.put(PositionGenerator.generate(file, rank), piece);
+            }
+            return squares;
         } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException |
                  InvocationTargetException e) {
             throw new RuntimeException(e);

@@ -1,6 +1,5 @@
 package domain.board;
 
-import dao.BoardDao;
 import domain.piece.Color;
 import domain.piece.None;
 import domain.piece.Pawn;
@@ -10,6 +9,7 @@ import domain.position.Position;
 import domain.position.PositionGenerator;
 import domain.position.Rank;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +17,6 @@ import java.util.Map.Entry;
 
 public class Board {
 
-    // TODO: 도메인과 DAO 분리하기!!
     private final Map<Position, Piece> squares;
 
     private Board(Map<Position, Piece> squares) {
@@ -35,14 +34,6 @@ public class Board {
 
     public static Board create(Map<Position, Piece> squares) {
         return new Board(squares);
-    }
-
-    private static boolean isBoardNotExist(BoardDao boardDao) {
-        return boardDao.countAll() == 0;
-    }
-
-    public void reset() {
-//        boardDao.delete();
     }
 
     public Piece findPieceByPosition(File file, Rank rank) {
@@ -108,5 +99,9 @@ public class Board {
         return squares.values().stream()
                 .filter(Piece::isKing)
                 .toList();
+    }
+
+    public Map<Position, Piece> getSquares() {
+        return Collections.unmodifiableMap(squares);
     }
 }

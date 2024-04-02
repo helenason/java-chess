@@ -1,12 +1,15 @@
 package dao.fake;
 
 import dao.BoardDao;
+import domain.board.Board;
 import domain.piece.Piece;
 import domain.position.File;
 import domain.position.Position;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 public class FakeBoardDao implements BoardDao {
@@ -17,6 +20,15 @@ public class FakeBoardDao implements BoardDao {
     public int save(Position position, Piece piece) {
         squares.put(position, piece);
         return 1;
+    }
+
+    @Override
+    public int saveAll(Board board) {
+        int savedCount = 0;
+        for (Entry<Position, Piece> entry : board.getSquares().entrySet()) {
+            savedCount += save(entry.getKey(), entry.getValue());
+        }
+        return savedCount;
     }
 
     @Override
@@ -42,6 +54,11 @@ public class FakeBoardDao implements BoardDao {
     @Override
     public List<Piece> findAllPieces() {
         return squares.values().stream().toList();
+    }
+
+    @Override
+    public Map<Position, Piece> findAllSquares() {
+        return Collections.unmodifiableMap(squares);
     }
 
     @Override
