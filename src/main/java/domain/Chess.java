@@ -17,12 +17,8 @@ public class Chess {
 
     private final Board board;
     private Turn turn;
-//    private final GameDao gameDao;
 
     public Chess(Board board, Turn turn) {
-//        this.gameDao = gameDao;
-//        gameDao.save(new Turn(Color.WHITE));
-//        this.board = Board.create(); // DB에 있으면 불러오고, 없으면 새로 생성하기
         this.board = board;
         this.turn = turn;
     }
@@ -40,7 +36,6 @@ public class Chess {
     private void validateMovement(Position sourcePosition, Position targetPosition) {
         validate(sourcePosition.equals(targetPosition), "[ERROR] 제자리에 있을 수 없습니다.");
 
-//        Turn turn = gameDao.findTurn().orElseGet(() -> new Turn(Color.NONE));
         Piece sourcePiece = board.findPieceByPosition(sourcePosition);
         Piece targetPiece = board.findPieceByPosition(targetPosition);
         validate(sourcePiece.isBlank(), "[ERROR] 출발지에 기물이 없어 이동하지 못했습니다.");
@@ -69,8 +64,6 @@ public class Chess {
 
     private void move(Position sourcePosition, Position targetPosition) {
         board.movePiece(sourcePosition, targetPosition);
-//        Turn turn = gameDao.findTurn().orElseGet(() -> new Turn(Color.NONE));
-//        gameDao.update(turn.opponent());
         turn = turn.opponent();
     }
 
@@ -86,7 +79,6 @@ public class Chess {
 
     public ChessResult judge() {
         ScoreCalculator scoreCalculator = new ScoreCalculator();
-//        Turn turn = gameDao.findTurn().orElseGet(() -> new Turn(Color.NONE));
         Map<Color, Double> score = new HashMap<>();
         double own = scoreCalculator.calculate(board, turn);
         double opponent = scoreCalculator.calculate(board, turn.opponent());
@@ -116,7 +108,6 @@ public class Chess {
     }
 
     public Turn getTurn() {
-//        return gameDao.findTurn().orElseGet(() -> new Turn(Color.NONE));
         return turn;
     }
 }
