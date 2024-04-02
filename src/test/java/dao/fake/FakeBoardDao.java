@@ -14,37 +14,41 @@ import java.util.Optional;
 
 public class FakeBoardDao implements BoardDao {
 
-    private final Map<Position, Piece> squares = new HashMap<>();
+    private final Map<Integer, Map<Position, Piece>> boards = new HashMap<>();
 
     @Override
-    public int save(Position position, Piece piece) {
+    public int save(int gameId, Position position, Piece piece) {
+        HashMap<Position, Piece> squares = new HashMap<>();
         squares.put(position, piece);
+        boards.put(gameId, squares);
         return 1;
     }
 
     @Override
-    public int saveAll(Board board) {
+    public int saveAll(int gameId, Board board) {
         int savedCount = 0;
         for (Entry<Position, Piece> entry : board.getSquares().entrySet()) {
-            savedCount += save(entry.getKey(), entry.getValue());
+            savedCount += save(gameId, entry.getKey(), entry.getValue());
         }
         return savedCount;
     }
 
     @Override
     public int countAll() {
-        return squares.size();
+        return boards.size();
     }
 
     @Override
-    public List<Piece> findPiecesByType(Class<? extends Piece> pieceType) {
+    public List<Piece> findPiecesByType(int gameId, Class<? extends Piece> pieceType) {
+        Map<Position, Piece> squares = boards.get(gameId);
         return squares.values().stream()
                 .filter(piece -> piece.getClass() == pieceType)
                 .toList();
     }
 
     @Override
-    public List<Piece> findPiecesByFile(File file) {
+    public List<Piece> findPiecesByFile(int gameId, File file) {
+        Map<Position, Piece> squares = boards.get(gameId);
         return squares.keySet().stream()
                 .filter(position -> position.hasFile(file))
                 .map(squares::get)
@@ -52,17 +56,20 @@ public class FakeBoardDao implements BoardDao {
     }
 
     @Override
-    public List<Piece> findAllPieces() {
+    public List<Piece> findPiecesByGame(int gameId) {
+        Map<Position, Piece> squares = boards.get(gameId);
         return squares.values().stream().toList();
     }
 
     @Override
-    public Map<Position, Piece> findAllSquares() {
+    public Map<Position, Piece> findSquaresByGame(int gameId) {
+        Map<Position, Piece> squares = boards.get(gameId);
         return Collections.unmodifiableMap(squares);
     }
 
     @Override
-    public Optional<Piece> findPieceByPosition(Position position) {
+    public Optional<Piece> findPieceByPosition(int gameId, Position position) {
+        Map<Position, Piece> squares = boards.get(gameId);
         if (squares.containsKey(position)) {
             return Optional.of(squares.get(position));
         }
@@ -70,15 +77,17 @@ public class FakeBoardDao implements BoardDao {
     }
 
     @Override
-    public int update(Position position, Piece piece) {
+    public int updateByGame(int gameId, Position position, Piece piece) {
+        Map<Position, Piece> squares = boards.get(gameId);
         squares.replace(position, piece);
         return 1;
     }
 
     @Override
-    public int delete() {
+    public int deleteByGame(int gameId) {
+        Map<Position, Piece> squares = boards.get(gameId);
         int beforeSize = squares.size();
-        squares.clear();
+        boards.replace(gameId, new HashMap<>());
         return beforeSize;
     }
 }

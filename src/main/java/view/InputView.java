@@ -38,6 +38,11 @@ public class InputView {
         }
     }
 
+    public String readGame() { // TODO: new, 숫자 검증
+        System.out.println("입장을 원하시면 게임방 번호를, 개설을 원하시면 new를 입력해주세요.");
+        return scanner.nextLine();
+    }
+
     public void clean() {
         scanner.nextLine();
     }

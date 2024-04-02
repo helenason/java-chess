@@ -23,14 +23,15 @@ public class Chess {
         this.turn = turn;
     }
 
-    public void tryMove(Position sourcePosition, Position targetPosition) {
+    public Piece tryMove(Position sourcePosition, Position targetPosition) {
         validateMovement(sourcePosition, targetPosition);
         if (canAttack(sourcePosition, targetPosition)) {
             attack(sourcePosition, targetPosition);
-            return;
+            return board.findPieceByPosition(targetPosition);
         }
         validateCanMove(sourcePosition, targetPosition);
         move(sourcePosition, targetPosition);
+        return board.findPieceByPosition(targetPosition);
     }
 
     private void validateMovement(Position sourcePosition, Position targetPosition) {

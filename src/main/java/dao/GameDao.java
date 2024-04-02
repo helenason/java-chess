@@ -1,6 +1,7 @@
 package dao;
 
 import domain.board.Turn;
+import java.util.Map;
 import java.util.Optional;
 
 public interface GameDao {
@@ -9,9 +10,11 @@ public interface GameDao {
 
     int countAll();
 
-    Optional<Turn> findTurn();
+    Map<Integer, Turn> findAll();
 
-    int update(Turn turn);
+    Optional<Turn> findTurnById(int id);
 
-    int delete();
+    int updateById(int id, Turn turn);
+
+    int deleteById(int id);
 }

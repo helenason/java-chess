@@ -9,6 +9,7 @@ import domain.position.Rank;
 import domain.result.ChessResult;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import view.mapper.output.ColorOutput;
 import view.mapper.output.PieceOutput;
 
@@ -19,6 +20,16 @@ public class OutputView {
         System.out.println("> 게임 시작 : start");
         System.out.println("> 게임 종료 : end");
         System.out.println("> 게임 이동 : move source위치 target위치 - 예. move b2 b3");
+    }
+
+    public void printGames(Map<Integer, Turn> games) {
+        if (games.isEmpty()) {
+            System.out.println("방이 존재하지 않습니다. 방을 개설해주세요.");
+            return;
+        }
+        games.forEach((gameId, turn) -> {
+            System.out.printf("%d번 게임방\n", gameId);
+        });
     }
 
     public void printBoard(Board board) {

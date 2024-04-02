@@ -8,6 +8,7 @@ import domain.Chess;
 import domain.board.Board;
 import domain.board.Turn;
 import domain.piece.Color;
+import domain.piece.None;
 import domain.piece.Piece;
 import domain.position.Position;
 import domain.result.ChessResult;
@@ -19,10 +20,14 @@ public class GameManager {
 
     private final InputView inputView;
     private final OutputView outputView;
+    private final GameDao gameDao;
+    private final BoardDao boardDao;
 
     public GameManager(InputView inputView, OutputView outputView) {
         this.inputView = inputView;
         this.outputView = outputView;
+        this.gameDao = new RealGameDao();
+        this.boardDao = new RealBoardDao();
     }
 
     public void start() {
@@ -43,63 +48,58 @@ public class GameManager {
     }
 
     private void playGame() {
-        Chess chess = initChess();
+        Map<Integer, Turn> games = gameDao.findAll();
+
+        outputView.printGames(games);
+        String option = inputView.readGame();
+
+        int gameId = createGame(option);
+        Turn turn = gameDao.findTurnById(gameId).orElseGet(() -> new Turn(Color.NONE));
+        Board board = createBoard(option, gameId);
+
+        Chess chess = initChess(board, turn);
+
         Command command;
         do {
             outputView.printTurn(chess.getTurn());
             command = requestCommand();
             if (command.isMove()) { // TODO: 들여쓰기 줄이기
-                tryMoveUntilNoError(chess);
+                tryMoveUntilNoError(chess, gameId);
             }
         } while (chess.canContinue() && wantContinue(chess, command));
 
         ChessResult result = chess.judge();
         outputView.printResult(result);
-        reset();
+        reset(gameId);
     }
 
-    private void reset() {
-        GameDao gameDao = new RealGameDao();
-        gameDao.delete();
-        BoardDao boardDao = new RealBoardDao();
-        boardDao.delete();
+    private void reset(int gameId) {
+        boardDao.deleteByGame(gameId);
+        gameDao.deleteById(gameId);
     }
 
-    private Chess initChess() {
-        Board board = createBoard();
-        Turn turn = createTurn();
+    private Chess initChess(Board board, Turn turn) {
         Chess chess = new Chess(board, turn);
         outputView.printBoard(chess.getBoard());
         return chess;
     }
 
-    private Turn createTurn() {
-        GameDao gameDao = new RealGameDao();
-        if (isGameExist(gameDao)) {
-            return gameDao.findTurn().orElseGet(() -> new Turn(Color.WHITE));
+    private int createGame(String option) {
+        if (option.equals("new")) {
+            return gameDao.save(new Turn(Color.WHITE));
         }
-        Turn turn = new Turn(Color.WHITE);
-        gameDao.save(turn);
-        return turn;
+        return Integer.parseInt(option);
     }
 
-    private boolean isGameExist(GameDao gameDao) {
-        return gameDao.countAll() != 0;
-    }
-
-    private Board createBoard() {
-        BoardDao boardDao = new RealBoardDao();
-        if (isBoardExist(boardDao)) {
-            Map<Position, Piece> squares = boardDao.findAllSquares();
-            return Board.create(squares);
+    private Board createBoard(String option, int gameId) {
+        if (option.equals("new")) {
+            Board board = Board.create();
+            boardDao.saveAll(gameId, board);
+            return board;
         }
-        Board board = Board.create();
-        boardDao.saveAll(board);
-        return board;
-    }
-
-    private boolean isBoardExist(BoardDao boardDao) {
-        return boardDao.countAll() != 0;
+        Map<Position, Piece> squares = boardDao.findSquaresByGame(gameId);
+        System.out.println(squares.size());
+        return Board.create(squares);
     }
 
     private boolean wantContinue(Chess chess, Command command) {
@@ -123,9 +123,9 @@ public class GameManager {
         }
     }
 
-    private void tryMoveUntilNoError(Chess chess) {
+    private void tryMoveUntilNoError(Chess chess, int gameId) {
         try {
-            tryMove(chess);
+            tryMove(chess, gameId);
         } catch (IllegalArgumentException e) {
             outputView.printError(e.getMessage());
         } finally {
@@ -133,12 +133,13 @@ public class GameManager {
         }
     }
 
-    private void tryMove(Chess chess) {
+    private void tryMove(Chess chess, int gameId) {
         Position sourcePosition = inputView.readPosition();
         Position targetPosition = inputView.readPosition();
-        chess.tryMove(sourcePosition, targetPosition);
-        GameDao gameDao = new RealGameDao();
-        gameDao.update(chess.getTurn());
+        Piece targetPiece = chess.tryMove(sourcePosition, targetPosition);
+        gameDao.updateById(gameId, chess.getTurn());
+        boardDao.updateByGame(gameId, targetPosition, targetPiece);
+        boardDao.updateByGame(gameId, sourcePosition, new None(Color.NONE));
         outputView.printBoard(chess.getBoard());
     }
 }

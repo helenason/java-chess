@@ -10,23 +10,23 @@ import java.util.Optional;
 
 public interface BoardDao {
 
-    int save(Position position, Piece piece);
+    int save(int gameId, Position position, Piece piece);
 
-    int saveAll(Board board);
+    int saveAll(int gameId, Board board);
 
     int countAll();
 
-    List<Piece> findPiecesByType(Class<? extends Piece> pieceType);
+    List<Piece> findPiecesByType(int gameId, Class<? extends Piece> pieceType);
 
-    List<Piece> findPiecesByFile(File file);
+    List<Piece> findPiecesByFile(int gameId, File file);
 
-    List<Piece> findAllPieces();
+    List<Piece> findPiecesByGame(int gameId);
 
-    Map<Position, Piece> findAllSquares();
+    Map<Position, Piece> findSquaresByGame(int gameId);
 
-    Optional<Piece> findPieceByPosition(Position position);
+    Optional<Piece> findPieceByPosition(int gameId, Position position);
 
-    int update(Position position, Piece piece);
+    int updateByGame(int gameId, Position position, Piece piece);
 
-    int delete();
+    int deleteByGame(int gameId);
 }

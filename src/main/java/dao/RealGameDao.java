@@ -6,7 +6,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class RealGameDao extends DaoConnection implements GameDao {
@@ -15,9 +18,14 @@ public class RealGameDao extends DaoConnection implements GameDao {
     public int save(Turn turn) {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("INSERT INTO game(turn) VALUES(?)");
+                    .prepareStatement("INSERT INTO game(turn) VALUES(?)", Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, TurnColor.asData(turn));
-            return preparedStatement.executeUpdate();
+            preparedStatement.executeUpdate();
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+            return 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -39,9 +47,30 @@ public class RealGameDao extends DaoConnection implements GameDao {
     }
 
     @Override
-    public Optional<Turn> findTurn() {
+    public Map<Integer, Turn> findAll() { // TODO: 반환값 매핑?
         try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT turn FROM game");
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("SELECT * FROM game");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Map<Integer, Turn> games = new HashMap<>();
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String rawTurn = resultSet.getString(2);
+                Color color = TurnColor.asColor(rawTurn);
+                games.put(id, new Turn(color));
+            }
+            return games;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Optional<Turn> findTurnById(int id) {
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("SELECT turn FROM game WHERE game_id = ?");
+            preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 String rawTurn = resultSet.getString("turn");
@@ -55,10 +84,12 @@ public class RealGameDao extends DaoConnection implements GameDao {
     }
 
     @Override
-    public int update(Turn turn) {
+    public int updateById(int id, Turn turn) {
         try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game SET turn = ?");
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("UPDATE game SET turn = ? WHERE game_id = ?");
             preparedStatement.setString(1, TurnColor.asData(turn));
+            preparedStatement.setInt(2, id);
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -66,9 +97,11 @@ public class RealGameDao extends DaoConnection implements GameDao {
     }
 
     @Override
-    public int delete() {
+    public int deleteById(int id) {
         try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM game");
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("DELETE FROM game WHERE game_id = ?");
+            preparedStatement.setInt(1, id);
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

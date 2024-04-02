@@ -2,18 +2,20 @@ package dao.fake;
 
 import dao.GameDao;
 import domain.board.Turn;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class FakeGameDao implements GameDao {
 
-    private final List<Turn> turns = new ArrayList<>();
+    private final Map<Integer, Turn> turns = new HashMap<>();
 
     @Override
     public int save(Turn turn) {
-        turns.add(turn);
-        return 1;
+        int id = turns.size();
+        turns.put(id, turn);
+        return id;
     }
 
     @Override
@@ -22,23 +24,24 @@ public class FakeGameDao implements GameDao {
     }
 
     @Override
-    public Optional<Turn> findTurn() {
-        if (turns.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(turns.get(0));
+    public Map<Integer, Turn> findAll() {
+        return Collections.unmodifiableMap(turns);
     }
 
     @Override
-    public int update(Turn turn) {
-        turns.remove(0);
-        turns.add(turn);
+    public Optional<Turn> findTurnById(int id) {
+        return Optional.ofNullable(turns.getOrDefault(id, null));
+    }
+
+    @Override
+    public int updateById(int id, Turn turn) {
+        turns.replace(id, turn);
         return 1;
     }
 
     @Override
-    public int delete() {
-        turns.remove(0);
+    public int deleteById(int id) {
+        turns.remove(id);
         return 1;
     }
 }

@@ -31,14 +31,15 @@ import java.util.Optional;
 public class RealBoardDao extends DaoConnection implements BoardDao {
 
     @Override
-    public int save(Position position, Piece piece) {
+    public int save(int gameId, Position position, Piece piece) {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO board(file_column, rank_row, piece_type, piece_color) VALUES(?, ?, ?, ?)");
+                    "INSERT INTO board(file_column, rank_row, piece_type, piece_color, game_id) VALUES(?, ?, ?, ?, ?)");
             preparedStatement.setInt(1, position.file()); // TODO: 여기서는 getter 를 써도 무방한가?
             preparedStatement.setInt(2, position.rank());
             preparedStatement.setString(3, PieceType.asData(piece));
             preparedStatement.setString(4, PieceColor.asData(piece));
+            preparedStatement.setInt(5, gameId);
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -46,10 +47,10 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
     }
 
     @Override
-    public int saveAll(Board board) {
+    public int saveAll(int gameId, Board board) {
         int savedCount = 0;
         for (Entry<Position, Piece> square : board.getSquares().entrySet()) {
-            savedCount += save(square.getKey(), square.getValue());
+            savedCount += save(gameId, square.getKey(), square.getValue());
         }
         return savedCount;
     }
@@ -70,11 +71,12 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
     }
 
     @Override
-    public List<Piece> findPiecesByType(Class<? extends Piece> pieceType) {
+    public List<Piece> findPiecesByType(int gameId, Class<? extends Piece> pieceType) {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM board WHERE piece_type = ?");
-            preparedStatement.setString(1, PieceType.asData(pieceType));
+                    "SELECT * FROM board WHERE game_id = ? and piece_type = ?");
+            preparedStatement.setInt(1, gameId);
+            preparedStatement.setString(2, PieceType.asData(pieceType));
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Piece> pieces = new ArrayList<>();
             while (resultSet.next()) {
@@ -92,12 +94,13 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
     }
 
     @Override
-    public List<Piece> findPiecesByFile(File file) {
+    public List<Piece> findPiecesByFile(int gameId, File file) {
         try (Connection connection = getConnection()) {
             List<Piece> pieces = new ArrayList<>();
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM board WHERE file_column = ?");
-            preparedStatement.setInt(1, file.order());
+                    "SELECT * FROM board WHERE game_id = ? and file_column = ?");
+            preparedStatement.setInt(1, gameId);
+            preparedStatement.setInt(2, file.order());
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -116,10 +119,11 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
     }
 
     @Override
-    public List<Piece> findAllPieces() {
+    public List<Piece> findPiecesByGame(int gameId) {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM board");
+                    "SELECT * FROM board WHERE game_id = ?");
+            preparedStatement.setInt(1, gameId);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             List<Piece> pieces = new ArrayList<>();
@@ -141,10 +145,11 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
     }
 
     @Override
-    public Map<Position, Piece> findAllSquares() {
+    public Map<Position, Piece> findSquaresByGame(int gameId) { // TODO: 위 메서드와 동일한 쿼리
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM board");
+                    "SELECT * FROM board WHERE game_id = ?");
+            preparedStatement.setInt(1, gameId);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             Map<Position, Piece> squares = new HashMap<>();
@@ -171,12 +176,13 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
     }
 
     @Override
-    public Optional<Piece> findPieceByPosition(Position position) {
+    public Optional<Piece> findPieceByPosition(int gameId, Position position) {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM board WHERE file_column = ? and rank_row = ?");
-            preparedStatement.setInt(1, position.file());
-            preparedStatement.setInt(2, position.rank());
+                    "SELECT * FROM board WHERE game_id = ? and file_column = ? and rank_row = ?");
+            preparedStatement.setInt(1, gameId);
+            preparedStatement.setInt(2, position.file());
+            preparedStatement.setInt(3, position.rank());
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
@@ -195,14 +201,16 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
     }
 
     @Override
-    public int update(Position position, Piece piece) {
+    public int updateByGame(int gameId, Position position, Piece piece) {
         try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "UPDATE board SET piece_type = ?, piece_color = ? WHERE file_column = ? and rank_row = ?");
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement(
+                            "UPDATE board SET piece_type = ?, piece_color = ? WHERE game_id = ? and file_column = ? and rank_row = ?");
             preparedStatement.setString(1, PieceType.asData(piece));
             preparedStatement.setString(2, PieceColor.asData(piece));
-            preparedStatement.setInt(3, position.file());
-            preparedStatement.setInt(4, position.rank());
+            preparedStatement.setInt(3, gameId);
+            preparedStatement.setInt(4, position.file());
+            preparedStatement.setInt(5, position.rank());
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -210,9 +218,11 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
     }
 
     @Override
-    public int delete() {
+    public int deleteByGame(int gameId) {
         try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM board");
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("DELETE FROM board WHERE game_id = ?");
+            preparedStatement.setInt(1, gameId);
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
