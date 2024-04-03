@@ -9,34 +9,34 @@ import java.util.Optional;
 
 public class FakeGameDao implements GameDao {
 
-    private final Map<Integer, Turn> turns = new HashMap<>();
+    private final Map<Integer, Turn> games = new HashMap<>();
 
     @Override
     public int save(Turn turn) {
-        int id = turns.size();
-        turns.put(id, turn);
+        int id = games.size();
+        games.put(id, turn);
         return id;
     }
 
     @Override
     public Map<Integer, Turn> findAll() {
-        return Collections.unmodifiableMap(turns);
+        return Collections.unmodifiableMap(games);
     }
 
     @Override
     public Optional<Turn> findTurnById(int id) {
-        return Optional.ofNullable(turns.getOrDefault(id, null));
+        return Optional.ofNullable(games.getOrDefault(id, null));
     }
 
     @Override
     public int updateById(int id, Turn turn) {
-        turns.replace(id, turn);
+        games.replace(id, turn);
         return 1;
     }
 
     @Override
     public int deleteById(int id) {
-        turns.remove(id);
+        games.remove(id);
         return 1;
     }
 }

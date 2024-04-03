@@ -15,7 +15,7 @@ public class FakeBoardDao implements BoardDao {
 
     @Override
     public int save(int gameId, Position position, Piece piece) {
-        HashMap<Position, Piece> squares = new HashMap<>();
+        Map<Position, Piece> squares = boards.getOrDefault(gameId, new HashMap<>());
         squares.put(position, piece);
         boards.put(gameId, squares);
         return 1;
@@ -46,8 +46,7 @@ public class FakeBoardDao implements BoardDao {
     @Override
     public int deleteByGame(int gameId) {
         Map<Position, Piece> squares = boards.get(gameId);
-        int beforeSize = squares.size();
         boards.replace(gameId, new HashMap<>());
-        return beforeSize;
+        return squares.size();
     }
 }
