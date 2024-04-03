@@ -38,9 +38,17 @@ public class InputView {
         }
     }
 
-    public String readGame() { // TODO: new, 숫자 검증
+    public String readEnterOption() {
         System.out.println("입장을 원하시면 게임방 번호를, 개설을 원하시면 new를 입력해주세요.");
-        return scanner.nextLine();
+        String input = scanner.nextLine();
+        validateFormat(input);
+        return input;
+    }
+
+    private void validateFormat(String rawEnterOption) {
+        if (!rawEnterOption.matches("new|\\d+")) {
+            throw new IllegalArgumentException("[ERROR] new 또는 방 번호를 입력해주세요.");
+        }
     }
 
     public void clean() {

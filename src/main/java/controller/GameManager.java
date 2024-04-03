@@ -13,6 +13,7 @@ import domain.piece.Piece;
 import domain.position.Position;
 import domain.result.ChessResult;
 import java.util.Map;
+import java.util.Set;
 import view.InputView;
 import view.OutputView;
 
@@ -51,7 +52,7 @@ public class GameManager {
         Map<Integer, Turn> games = gameDao.findAll();
 
         outputView.printGames(games);
-        String option = inputView.readGame();
+        String option = requestEnterOption(games);
 
         int gameId = createGame(option);
         Turn turn = gameDao.findTurnById(gameId).orElseGet(() -> new Turn(Color.NONE));
@@ -71,6 +72,32 @@ public class GameManager {
         ChessResult result = chess.judge();
         outputView.printResult(result);
         reset(gameId);
+    }
+
+    private String requestEnterOption(Map<Integer, Turn> games) {
+        try {
+            String enterOption = inputView.readEnterOption();
+            validateRoomNumberRange(games, enterOption);
+            return enterOption;
+        } catch (IllegalArgumentException e) {
+            outputView.printError(e.getMessage());
+            return requestEnterOption(games);
+        }
+    }
+
+    private void validateRoomNumberRange(Map<Integer, Turn> games, String enterOption) {
+        if (enterOption.equals("new")) {
+            return;
+        }
+        int roomNumber = Integer.parseInt(enterOption);
+        if (hasRoomNumber(games.keySet(), roomNumber)) {
+            throw new IllegalArgumentException("[ERROR] 존재하는 방 번호를 입력해주세요.");
+        }
+    }
+
+    private boolean hasRoomNumber(Set<Integer> roomNumbers, int roomNumber) {
+        return roomNumbers.stream()
+                .noneMatch(number -> number == roomNumber);
     }
 
     private void reset(int gameId) {
