@@ -33,7 +33,7 @@ public class GameManager {
         outputView.printStartNotice();
         Command initCommand = requestInitCommand();
         if (initCommand.isStart()) {
-            playGame();
+            play();
         }
     }
 
@@ -46,39 +46,32 @@ public class GameManager {
         }
     }
 
-    private void playGame() { // TODO: 들여쓰기 줄이기, 코드 길이 줄이기
+    private void play() {
         Map<Integer, Turn> games = gameDao.findAll();
+        Set<Integer> rooms = games.keySet();
+        outputView.printRooms(rooms);
 
-        outputView.printGames(games);
+        RoomCommand roomCommand = requestRoomCommand();
+        int gameId = requestRoom(roomCommand, rooms);
 
-        RoomCommand roomCommand;
-        int gameId;
-        while (true) {
-            try {
-                roomCommand = requestRoomCommand();
-                gameId = createRoom(roomCommand, games.keySet());
-                break;
-            } catch (IllegalArgumentException e) {
-                outputView.printError(e.getMessage());
-            }
-        }
-        Board board = createBoard(roomCommand, gameId);
-        Turn turn = gameDao.findTurnById(gameId).orElseGet(() -> new Turn(Color.NONE));
+        Chess chess = initChess(roomCommand, gameId);
 
-        Chess chess = initChess(board, turn);
-
-        Command command;
-        do {
-            outputView.printTurn(chess.getTurn());
-            command = requestCommand();
-            if (command.isMove()) {
-                tryMoveUntilNoError(chess, gameId);
-            }
-        } while (chess.canContinue() && wantContinue(chess, command));
+        playGame(chess, gameId);
 
         ChessResult result = chess.judge();
         outputView.printResult(result);
         reset(gameId);
+    }
+
+    private void playGame(Chess chess, int gameId) {
+        Command gameCommand;
+        do {
+            outputView.printTurn(chess.getTurn());
+            gameCommand = requestCommand();
+            if (gameCommand.isMove()) {
+                tryMoveUntilNoError(chess, gameId);
+            }
+        } while (chess.canContinue() && wantContinue(chess, gameCommand));
     }
 
     private RoomCommand requestRoomCommand() {
@@ -106,19 +99,26 @@ public class GameManager {
         gameDao.deleteById(gameId);
     }
 
-    private Chess initChess(Board board, Turn turn) {
+    private Chess initChess(RoomCommand roomCommand, int gameId) {
+        Board board = createBoard(roomCommand, gameId);
+        Turn turn = gameDao.findTurnById(gameId).orElseGet(() -> new Turn(Color.NONE));
         Chess chess = new Chess(board, turn);
         outputView.printBoard(chess.getBoard());
         return chess;
     }
 
-    private int createRoom(RoomCommand roomCommand, Set<Integer> rooms) {
-        if (roomCommand.wantCreate()) {
-            return gameDao.save(new Turn(Color.WHITE));
+    private int requestRoom(RoomCommand roomCommand, Set<Integer> rooms) {
+        try {
+            if (roomCommand.wantCreate()) {
+                return gameDao.save(new Turn(Color.WHITE));
+            }
+            int roomNumber = inputView.readRoomNumber();
+            validateRoomNumberRange(rooms, roomNumber);
+            return roomNumber;
+        } catch (IllegalArgumentException e) {
+            outputView.printError(e.getMessage());
+            return requestRoom(requestRoomCommand(), rooms);
         }
-        int roomNumber = inputView.readRoomNumber();
-        validateRoomNumberRange(rooms, roomNumber);
-        return roomNumber;
     }
 
     private Board createBoard(RoomCommand roomCommand, int gameId) {
@@ -133,7 +133,7 @@ public class GameManager {
 
     private boolean wantContinue(Chess chess, Command command) {
         if (command.isStart()) {
-            playGame();
+            play();
         }
         if (command.isStatus()) {
             ChessResult result = chess.judge();

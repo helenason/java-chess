@@ -32,7 +32,7 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO board(file_column, rank_row, piece_type, piece_color, game_id) VALUES(?, ?, ?, ?, ?)");
-            preparedStatement.setInt(1, position.file()); // TODO: 여기서는 getter 를 써도 무방한가?
+            preparedStatement.setInt(1, position.file());
             preparedStatement.setInt(2, position.rank());
             preparedStatement.setString(3, PieceType.asData(piece));
             preparedStatement.setString(4, PieceColor.asData(piece));
@@ -53,7 +53,7 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
     }
 
     @Override
-    public Map<Position, Piece> findSquaresByGame(int gameId) { // TODO: 위 메서드와 동일한 쿼리
+    public Map<Position, Piece> findSquaresByGame(int gameId) {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT * FROM board WHERE game_id = ?");

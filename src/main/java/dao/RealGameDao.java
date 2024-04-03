@@ -32,7 +32,7 @@ public class RealGameDao extends DaoConnection implements GameDao {
     }
 
     @Override
-    public Map<Integer, Turn> findAll() { // TODO: 반환값 매핑?
+    public Map<Integer, Turn> findAll() {
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("SELECT * FROM game");

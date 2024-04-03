@@ -4,6 +4,7 @@ import controller.Command;
 import controller.RoomCommand;
 import domain.position.Position;
 import domain.position.PositionGenerator;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import view.mapper.input.CommandInput;
 import view.mapper.input.RoomCommandInput;
@@ -48,7 +49,11 @@ public class InputView {
     }
 
     public int readRoomNumber() {
-        return scanner.nextInt(); // TODO: int 가 아니라면?
+        try {
+            return scanner.nextInt();
+        } catch (InputMismatchException e) {
+            throw new IllegalArgumentException("[ERROR] 올바른 명령어를 입력해주세요.");
+        }
     }
 
     public void clean() {

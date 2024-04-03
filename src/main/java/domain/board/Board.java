@@ -30,7 +30,7 @@ public class Board {
     public static Board create(BoardGenerator boardGenerator) {
         Map<Position, Piece> squares = boardGenerator.generate();
         return new Board(squares);
-    } // TODO: 오직 테스트만을 위한 메서드?
+    }
 
     public static Board create(Map<Position, Piece> squares) {
         return new Board(squares);
