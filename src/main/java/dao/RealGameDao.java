@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class RealGameDao extends DaoConnection implements GameDao {
+public class RealGameDao extends RealDao implements GameDao {
 
     @Override
     public int save(Turn turn) {

@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class RealBoardDao extends DaoConnection implements BoardDao {
+public class RealBoardDao extends RealDao implements BoardDao {
 
     @Override
     public int save(int gameId, Position position, Piece piece) {
