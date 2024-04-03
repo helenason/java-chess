@@ -32,21 +32,6 @@ public class RealGameDao extends DaoConnection implements GameDao {
     }
 
     @Override
-    public int countAll() {
-        try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection
-                    .prepareStatement("SELECT COUNT(*) FROM game");
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt(1);
-            }
-            return 0;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public Map<Integer, Turn> findAll() { // TODO: 반환값 매핑?
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection

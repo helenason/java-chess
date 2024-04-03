@@ -20,13 +20,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 
 public class RealBoardDao extends DaoConnection implements BoardDao {
 
@@ -56,95 +53,6 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
     }
 
     @Override
-    public int countAll() {
-        try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT COUNT(*) FROM board");
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return Integer.parseInt(resultSet.getString(1));
-            }
-            return 0;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public List<Piece> findPiecesByType(int gameId, Class<? extends Piece> pieceType) {
-        try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM board WHERE game_id = ? and piece_type = ?");
-            preparedStatement.setInt(1, gameId);
-            preparedStatement.setString(2, PieceType.asData(pieceType));
-            ResultSet resultSet = preparedStatement.executeQuery();
-            List<Piece> pieces = new ArrayList<>();
-            while (resultSet.next()) {
-                String pieceColor = resultSet.getString("piece_color");
-                Color color = PieceColor.asColor(pieceColor);
-                Constructor<? extends Piece> constructor = pieceType.getConstructor(Color.class);
-                Piece piece = constructor.newInstance(color);
-                pieces.add(piece);
-            }
-            return pieces;
-        } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public List<Piece> findPiecesByFile(int gameId, File file) {
-        try (Connection connection = getConnection()) {
-            List<Piece> pieces = new ArrayList<>();
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM board WHERE game_id = ? and file_column = ?");
-            preparedStatement.setInt(1, gameId);
-            preparedStatement.setInt(2, file.order());
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                String pieceType = resultSet.getString("piece_type");
-                String pieceColor = resultSet.getString("piece_color");
-                Class<? extends Piece> type = PieceType.asType(pieceType);
-                Constructor<? extends Piece> constructor = type.getConstructor(Color.class);
-                Color color = PieceColor.asColor(pieceColor);
-                pieces.add(constructor.newInstance(color));
-            }
-            return pieces;
-        } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public List<Piece> findPiecesByGame(int gameId) {
-        try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM board WHERE game_id = ?");
-            preparedStatement.setInt(1, gameId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            List<Piece> pieces = new ArrayList<>();
-            while (resultSet.next()) {
-                String pieceType = resultSet.getString("piece_type");
-                String pieceColor = resultSet.getString("piece_color");
-                Class<? extends Piece> type = PieceType.asType(pieceType);
-                Constructor<? extends Piece> constructor = type.getConstructor(Color.class);
-                Color color = PieceColor.asColor(pieceColor);
-                Piece piece = constructor.newInstance(color);
-
-                pieces.add(piece);
-            }
-            return pieces;
-        } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public Map<Position, Piece> findSquaresByGame(int gameId) { // TODO: 위 메서드와 동일한 쿼리
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
@@ -169,31 +77,6 @@ public class RealBoardDao extends DaoConnection implements BoardDao {
                 squares.put(PositionGenerator.generate(file, rank), piece);
             }
             return squares;
-        } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public Optional<Piece> findPieceByPosition(int gameId, Position position) {
-        try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM board WHERE game_id = ? and file_column = ? and rank_row = ?");
-            preparedStatement.setInt(1, gameId);
-            preparedStatement.setInt(2, position.file());
-            preparedStatement.setInt(3, position.rank());
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                String pieceType = resultSet.getString("piece_type");
-                String pieceColor = resultSet.getString("piece_color");
-                Class<? extends Piece> type = PieceType.asType(pieceType); // TODO: 괜찮은 방법인지 체크 (첫 사용이라서)
-                Constructor<? extends Piece> constructor = type.getConstructor(Color.class);
-                Color color = PieceColor.asColor(pieceColor);
-                return Optional.of(constructor.newInstance(color));
-            }
-            return Optional.empty();
         } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException |
                  InvocationTargetException e) {
             throw new RuntimeException(e);

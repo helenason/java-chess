@@ -8,8 +8,6 @@ public interface GameDao {
 
     int save(Turn turn);
 
-    int countAll();
-
     Map<Integer, Turn> findAll();
 
     Optional<Turn> findTurnById(int id);

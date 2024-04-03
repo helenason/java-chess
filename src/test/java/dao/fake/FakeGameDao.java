@@ -19,11 +19,6 @@ public class FakeGameDao implements GameDao {
     }
 
     @Override
-    public int countAll() {
-        return turns.size();
-    }
-
-    @Override
     public Map<Integer, Turn> findAll() {
         return Collections.unmodifiableMap(turns);
     }

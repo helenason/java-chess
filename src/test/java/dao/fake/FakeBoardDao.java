@@ -3,14 +3,11 @@ package dao.fake;
 import dao.BoardDao;
 import domain.board.Board;
 import domain.piece.Piece;
-import domain.position.File;
 import domain.position.Position;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 
 public class FakeBoardDao implements BoardDao {
 
@@ -34,46 +31,9 @@ public class FakeBoardDao implements BoardDao {
     }
 
     @Override
-    public int countAll() {
-        return boards.size();
-    }
-
-    @Override
-    public List<Piece> findPiecesByType(int gameId, Class<? extends Piece> pieceType) {
-        Map<Position, Piece> squares = boards.get(gameId);
-        return squares.values().stream()
-                .filter(piece -> piece.getClass() == pieceType)
-                .toList();
-    }
-
-    @Override
-    public List<Piece> findPiecesByFile(int gameId, File file) {
-        Map<Position, Piece> squares = boards.get(gameId);
-        return squares.keySet().stream()
-                .filter(position -> position.hasFile(file))
-                .map(squares::get)
-                .toList();
-    }
-
-    @Override
-    public List<Piece> findPiecesByGame(int gameId) {
-        Map<Position, Piece> squares = boards.get(gameId);
-        return squares.values().stream().toList();
-    }
-
-    @Override
     public Map<Position, Piece> findSquaresByGame(int gameId) {
         Map<Position, Piece> squares = boards.get(gameId);
         return Collections.unmodifiableMap(squares);
-    }
-
-    @Override
-    public Optional<Piece> findPieceByPosition(int gameId, Position position) {
-        Map<Position, Piece> squares = boards.get(gameId);
-        if (squares.containsKey(position)) {
-            return Optional.of(squares.get(position));
-        }
-        return Optional.empty();
     }
 
     @Override
