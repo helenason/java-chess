@@ -1,10 +1,12 @@
 package view;
 
 import controller.Command;
+import controller.RoomCommand;
 import domain.position.Position;
 import domain.position.PositionGenerator;
 import java.util.Scanner;
 import view.mapper.input.CommandInput;
+import view.mapper.input.RoomCommandInput;
 
 public class InputView {
 
@@ -38,17 +40,15 @@ public class InputView {
         }
     }
 
-    public String readEnterOption() {
-        System.out.println("입장을 원하시면 게임방 번호를, 개설을 원하시면 new를 입력해주세요.");
-        String input = scanner.nextLine();
-        validateFormat(input);
-        return input;
+    public RoomCommand readRoomCommand() {
+        System.out.println("> 게임방 입장 : enter 방번호 - 예. enter 5");
+        System.out.println("> 게임방 개설 : create");
+        String input = scanner.next();
+        return RoomCommandInput.asCommand(input);
     }
 
-    private void validateFormat(String rawEnterOption) {
-        if (!rawEnterOption.matches("new|\\d+")) {
-            throw new IllegalArgumentException("[ERROR] new 또는 방 번호를 입력해주세요.");
-        }
+    public int readRoomNumber() {
+        return scanner.nextInt(); // TODO: int 가 아니라면?
     }
 
     public void clean() {

@@ -27,9 +27,11 @@ public class OutputView {
             System.out.println("방이 존재하지 않습니다. 방을 개설해주세요.");
             return;
         }
+        System.out.println("=== 게임방 목록 시작 ===");
         games.forEach((gameId, turn) -> {
             System.out.printf("%d번 게임방\n", gameId);
         });
+        System.out.println("=== 게임방 목록 끝 ===");
     }
 
     public void printBoard(Board board) {

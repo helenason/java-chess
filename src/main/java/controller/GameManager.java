@@ -46,15 +46,24 @@ public class GameManager {
         }
     }
 
-    private void playGame() {
+    private void playGame() { // TODO: 들여쓰기 줄이기, 코드 길이 줄이기
         Map<Integer, Turn> games = gameDao.findAll();
 
         outputView.printGames(games);
-        String option = requestEnterOption(games);
 
-        int gameId = createGame(option);
+        RoomCommand roomCommand;
+        int gameId;
+        while (true) {
+            try {
+                roomCommand = requestRoomCommand();
+                gameId = createRoom(roomCommand, games.keySet());
+                break;
+            } catch (IllegalArgumentException e) {
+                outputView.printError(e.getMessage());
+            }
+        }
+        Board board = createBoard(roomCommand, gameId);
         Turn turn = gameDao.findTurnById(gameId).orElseGet(() -> new Turn(Color.NONE));
-        Board board = createBoard(option, gameId);
 
         Chess chess = initChess(board, turn);
 
@@ -62,7 +71,7 @@ public class GameManager {
         do {
             outputView.printTurn(chess.getTurn());
             command = requestCommand();
-            if (command.isMove()) { // TODO: 들여쓰기 줄이기
+            if (command.isMove()) {
                 tryMoveUntilNoError(chess, gameId);
             }
         } while (chess.canContinue() && wantContinue(chess, command));
@@ -72,28 +81,22 @@ public class GameManager {
         reset(gameId);
     }
 
-    private String requestEnterOption(Map<Integer, Turn> games) {
+    private RoomCommand requestRoomCommand() {
         try {
-            String enterOption = inputView.readEnterOption();
-            validateRoomNumberRange(games, enterOption);
-            return enterOption;
+            return inputView.readRoomCommand();
         } catch (IllegalArgumentException e) {
             outputView.printError(e.getMessage());
-            return requestEnterOption(games);
+            return requestRoomCommand();
         }
     }
 
-    private void validateRoomNumberRange(Map<Integer, Turn> games, String enterOption) {
-        if (enterOption.equals("new")) {
-            return;
-        }
-        int roomNumber = Integer.parseInt(enterOption);
-        if (hasRoomNumber(games.keySet(), roomNumber)) {
+    private void validateRoomNumberRange(Set<Integer> rooms, int roomNumber) {
+        if (hasNotRoomNumber(rooms, roomNumber)) {
             throw new IllegalArgumentException("[ERROR] 존재하는 방 번호를 입력해주세요.");
         }
     }
 
-    private boolean hasRoomNumber(Set<Integer> roomNumbers, int roomNumber) {
+    private boolean hasNotRoomNumber(Set<Integer> roomNumbers, int roomNumber) {
         return roomNumbers.stream()
                 .noneMatch(number -> number == roomNumber);
     }
@@ -109,21 +112,22 @@ public class GameManager {
         return chess;
     }
 
-    private int createGame(String option) {
-        if (option.equals("new")) {
+    private int createRoom(RoomCommand roomCommand, Set<Integer> rooms) {
+        if (roomCommand.wantCreate()) {
             return gameDao.save(new Turn(Color.WHITE));
         }
-        return Integer.parseInt(option);
+        int roomNumber = inputView.readRoomNumber();
+        validateRoomNumberRange(rooms, roomNumber);
+        return roomNumber;
     }
 
-    private Board createBoard(String option, int gameId) {
-        if (option.equals("new")) {
+    private Board createBoard(RoomCommand roomCommand, int gameId) {
+        if (roomCommand.wantCreate()) {
             Board board = Board.create();
             boardDao.saveAll(gameId, board);
             return board;
         }
         Map<Position, Piece> squares = boardDao.findSquaresByGame(gameId);
-        System.out.println(squares.size());
         return Board.create(squares);
     }
 
