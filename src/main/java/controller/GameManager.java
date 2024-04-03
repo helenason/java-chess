@@ -2,8 +2,6 @@ package controller;
 
 import dao.BoardDao;
 import dao.GameDao;
-import dao.RealBoardDao;
-import dao.RealGameDao;
 import domain.Chess;
 import domain.board.Board;
 import domain.board.Turn;
@@ -24,11 +22,11 @@ public class GameManager {
     private final GameDao gameDao;
     private final BoardDao boardDao;
 
-    public GameManager(InputView inputView, OutputView outputView) {
+    public GameManager(InputView inputView, OutputView outputView, GameDao gameDao, BoardDao boardDao) {
         this.inputView = inputView;
         this.outputView = outputView;
-        this.gameDao = new RealGameDao();
-        this.boardDao = new RealBoardDao();
+        this.gameDao = gameDao;
+        this.boardDao = boardDao;
     }
 
     public void start() {
