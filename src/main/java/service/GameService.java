@@ -53,7 +53,7 @@ public class GameService {
     }
 
     private Turn createTurn(int gameId) {
-        return gameDao.findTurnById(gameId).orElseGet(() -> new Turn(Color.NONE));
+        return gameDao.findTurnById(gameId).orElseThrow(() -> new IllegalArgumentException("[ERROR] 유효하지 않은 차례입니다."));
     }
 
     public void updateMovement(int gameId, Position sourcePosition, Position targetPosition) {
