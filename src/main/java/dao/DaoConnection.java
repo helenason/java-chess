@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class RealDao {
+public class DaoConnection {
 
     private static final String SERVER = "localhost:3306";
     private static final String DATABASE = "chess";

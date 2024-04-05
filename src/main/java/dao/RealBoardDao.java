@@ -25,11 +25,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class RealBoardDao extends RealDao implements BoardDao {
+public class RealBoardDao implements BoardDao {
+
+    private final DaoConnection daoConnection = new DaoConnection();
 
     @Override
     public int save(int gameId, Position position, Piece piece) {
-        try (Connection connection = getConnection()) {
+        try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO board(file_column, rank_row, piece_type, piece_color, game_id) VALUES(?, ?, ?, ?, ?)");
             preparedStatement.setInt(1, position.file());
@@ -54,7 +56,7 @@ public class RealBoardDao extends RealDao implements BoardDao {
 
     @Override
     public Map<Position, Piece> findSquaresByGame(int gameId) {
-        try (Connection connection = getConnection()) {
+        try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT * FROM board WHERE game_id = ?");
             preparedStatement.setInt(1, gameId);
@@ -85,7 +87,7 @@ public class RealBoardDao extends RealDao implements BoardDao {
 
     @Override
     public int updateByGame(int gameId, Position position, Piece piece) {
-        try (Connection connection = getConnection()) {
+        try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection
                     .prepareStatement(
                             "UPDATE board SET piece_type = ?, piece_color = ? WHERE game_id = ? and file_column = ? and rank_row = ?");
@@ -102,7 +104,7 @@ public class RealBoardDao extends RealDao implements BoardDao {
 
     @Override
     public int deleteByGame(int gameId) {
-        try (Connection connection = getConnection()) {
+        try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("DELETE FROM board WHERE game_id = ?");
             preparedStatement.setInt(1, gameId);

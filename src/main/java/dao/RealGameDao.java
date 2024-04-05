@@ -12,11 +12,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class RealGameDao extends RealDao implements GameDao {
+public class RealGameDao implements GameDao {
+
+    private final DaoConnection daoConnection = new DaoConnection();
 
     @Override
     public int save(Turn turn) {
-        try (Connection connection = getConnection()) {
+        try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("INSERT INTO game(turn) VALUES(?)", Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, TurnColor.asData(turn));
@@ -33,7 +35,7 @@ public class RealGameDao extends RealDao implements GameDao {
 
     @Override
     public Map<Integer, Turn> findAll() {
-        try (Connection connection = getConnection()) {
+        try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("SELECT * FROM game");
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -52,7 +54,7 @@ public class RealGameDao extends RealDao implements GameDao {
 
     @Override
     public Optional<Turn> findTurnById(int id) {
-        try (Connection connection = getConnection()) {
+        try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("SELECT turn FROM game WHERE game_id = ?");
             preparedStatement.setInt(1, id);
@@ -70,7 +72,7 @@ public class RealGameDao extends RealDao implements GameDao {
 
     @Override
     public int updateById(int id, Turn turn) {
-        try (Connection connection = getConnection()) {
+        try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("UPDATE game SET turn = ? WHERE game_id = ?");
             preparedStatement.setString(1, TurnColor.asData(turn));
@@ -83,7 +85,7 @@ public class RealGameDao extends RealDao implements GameDao {
 
     @Override
     public int deleteById(int id) {
-        try (Connection connection = getConnection()) {
+        try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("DELETE FROM game WHERE game_id = ?");
             preparedStatement.setInt(1, id);
