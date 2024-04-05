@@ -41,7 +41,7 @@ public class RealBoardDao implements BoardDao {
             preparedStatement.setInt(5, gameId);
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[DB_ERROR] 데이터베이스 에러입니다. 관리자에게 문의해주세요.");
         }
     }
 
@@ -81,7 +81,7 @@ public class RealBoardDao implements BoardDao {
             return squares;
         } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException |
                  InvocationTargetException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[DB_ERROR] 데이터베이스 에러입니다. 관리자에게 문의해주세요.");
         }
     }
 
@@ -98,7 +98,7 @@ public class RealBoardDao implements BoardDao {
             preparedStatement.setInt(5, position.rank());
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[DB_ERROR] 데이터베이스 에러입니다. 관리자에게 문의해주세요.");
         }
     }
 
@@ -110,7 +110,7 @@ public class RealBoardDao implements BoardDao {
             preparedStatement.setInt(1, gameId);
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[DB_ERROR] 데이터베이스 에러입니다. 관리자에게 문의해주세요.");
         }
     }
 

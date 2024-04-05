@@ -29,7 +29,7 @@ public class RealGameDao implements GameDao {
             }
             return 0;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[DB_ERROR] 데이터베이스 에러입니다. 관리자에게 문의해주세요.");
         }
     }
 
@@ -48,7 +48,7 @@ public class RealGameDao implements GameDao {
             }
             return games;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[DB_ERROR] 데이터베이스 에러입니다. 관리자에게 문의해주세요.");
         }
     }
 
@@ -66,7 +66,7 @@ public class RealGameDao implements GameDao {
             }
             return Optional.empty();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[DB_ERROR] 데이터베이스 에러입니다. 관리자에게 문의해주세요.");
         }
     }
 
@@ -79,7 +79,7 @@ public class RealGameDao implements GameDao {
             preparedStatement.setInt(2, id);
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[DB_ERROR] 데이터베이스 에러입니다. 관리자에게 문의해주세요.");
         }
     }
 
@@ -91,7 +91,7 @@ public class RealGameDao implements GameDao {
             preparedStatement.setInt(1, id);
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[DB_ERROR] 데이터베이스 에러입니다. 관리자에게 문의해주세요.");
         }
     }
 
