@@ -14,8 +14,6 @@ import domain.position.File;
 import domain.position.Position;
 import domain.position.PositionGenerator;
 import domain.position.Rank;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 public class RealBoardDao implements BoardDao {
 
@@ -71,16 +70,12 @@ public class RealBoardDao implements BoardDao {
 
                 String pieceType = resultSet.getString("piece_type");
                 String pieceColor = resultSet.getString("piece_color");
-                Class<? extends Piece> type = PieceType.asType(pieceType);
-                Constructor<? extends Piece> constructor = type.getConstructor(Color.class);
                 Color color = PieceColor.asColor(pieceColor);
-                Piece piece = constructor.newInstance(color);
-
+                Piece piece = PieceType.asType(pieceType, color);
                 squares.put(PositionGenerator.generate(file, rank), piece);
             }
             return squares;
-        } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException e) {
+        } catch (SQLException e) {
             throw new RuntimeException("[DB_ERROR] 데이터베이스 에러입니다. 관리자에게 문의해주세요.");
         }
     }
@@ -116,45 +111,37 @@ public class RealBoardDao implements BoardDao {
 
     private enum PieceType {
 
-        BISHOP(Bishop.class, "bishop"),
-        ROOK(Rook.class, "rook"),
-        QUEEN(Queen.class, "queen"),
-        KING(King.class, "king"),
-        KNIGHT(Knight.class, "knight"),
-        PAWN(Pawn.class, "pawn"),
-        NONE(None.class, "none"),
+        BISHOP("bishop", Bishop::new),
+        ROOK("rook", Rook::new),
+        QUEEN("queen", Queen::new),
+        KING("king", King::new),
+        KNIGHT("knight", Knight::new),
+        PAWN("pawn", Pawn::new),
+        NONE("none", None::new),
         ;
 
-        private final Class<? extends Piece> type;
         private final String dataOutput;
+        private final Function<Color, Piece> pieceGenerator;
 
-        PieceType(Class<? extends Piece> type, String dataOutput) {
-            this.type = type;
+        PieceType(String dataOutput, Function<Color, Piece> pieceGenerator) {
             this.dataOutput = dataOutput;
+            this.pieceGenerator = pieceGenerator;
         }
 
         private static String asData(Piece piece) {
             return Arrays.stream(values())
-                    .filter(pieceType -> pieceType.type == piece.getClass())
+                    .filter(pieceType -> pieceType.pieceGenerator.apply(piece.color()).equals(piece))
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
                     .dataOutput;
         }
 
-        private static String asData(Class<? extends Piece> type) {
-            return Arrays.stream(values())
-                    .filter(pieceType -> pieceType.type == type)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
-                    .dataOutput;
-        }
-
-        private static Class<? extends Piece> asType(String dataOutput) {
+        private static Piece asType(String dataOutput, Color color) {
             return Arrays.stream(values())
                     .filter(pieceType -> pieceType.dataOutput.equals(dataOutput))
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
-                    .type;
+                    .pieceGenerator.apply(color);
         }
     }
 
