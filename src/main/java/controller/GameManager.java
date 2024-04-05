@@ -1,17 +1,10 @@
 package controller;
 
-import dao.BoardDao;
-import dao.GameDao;
 import domain.Chess;
-import domain.board.Board;
-import domain.board.Turn;
-import domain.piece.Color;
-import domain.piece.None;
-import domain.piece.Piece;
 import domain.position.Position;
 import domain.result.ChessResult;
-import java.util.Map;
 import java.util.Set;
+import service.GameService;
 import view.InputView;
 import view.OutputView;
 
@@ -19,14 +12,12 @@ public class GameManager {
 
     private final InputView inputView;
     private final OutputView outputView;
-    private final GameDao gameDao;
-    private final BoardDao boardDao;
+    private final GameService gameService;
 
-    public GameManager(InputView inputView, OutputView outputView, GameDao gameDao, BoardDao boardDao) {
+    public GameManager(InputView inputView, OutputView outputView, GameService gameService) {
         this.inputView = inputView;
         this.outputView = outputView;
-        this.gameDao = gameDao;
-        this.boardDao = boardDao;
+        this.gameService = gameService;
     }
 
     public void start() {
@@ -47,8 +38,7 @@ public class GameManager {
     }
 
     private void play() {
-        Map<Integer, Turn> games = gameDao.findAll();
-        Set<Integer> rooms = games.keySet();
+        Set<Integer> rooms = gameService.findRooms();
         outputView.printRooms(rooms);
 
         RoomCommand roomCommand = requestRoomCommand();
@@ -60,7 +50,7 @@ public class GameManager {
 
         ChessResult result = chess.judge();
         outputView.printResult(result);
-        reset(gameId);
+        gameService.resetGame(gameId);
     }
 
     private void playGame(Chess chess, int gameId) {
@@ -94,15 +84,8 @@ public class GameManager {
                 .noneMatch(number -> number == roomNumber);
     }
 
-    private void reset(int gameId) {
-        boardDao.deleteByGame(gameId);
-        gameDao.deleteById(gameId);
-    }
-
     private Chess initChess(RoomCommand roomCommand, int gameId) {
-        Board board = createBoard(roomCommand, gameId);
-        Turn turn = gameDao.findTurnById(gameId).orElseGet(() -> new Turn(Color.NONE));
-        Chess chess = new Chess(board, turn);
+        Chess chess = gameService.initChess(roomCommand, gameId);
         outputView.printBoard(chess.getBoard());
         return chess;
     }
@@ -110,7 +93,7 @@ public class GameManager {
     private int requestRoom(RoomCommand roomCommand, Set<Integer> rooms) {
         try {
             if (roomCommand.wantCreate()) {
-                return gameDao.save(new Turn(Color.WHITE));
+                return gameService.createGame();
             }
             int roomNumber = inputView.readRoomNumber();
             validateRoomNumberRange(rooms, roomNumber);
@@ -119,16 +102,6 @@ public class GameManager {
             outputView.printError(e.getMessage());
             return requestRoom(requestRoomCommand(), rooms);
         }
-    }
-
-    private Board createBoard(RoomCommand roomCommand, int gameId) {
-        if (roomCommand.wantCreate()) {
-            Board board = Board.create();
-            boardDao.saveAll(gameId, board);
-            return board;
-        }
-        Map<Position, Piece> squares = boardDao.findSquaresByGame(gameId);
-        return Board.create(squares);
     }
 
     private boolean wantContinue(Chess chess, Command command) {
@@ -165,10 +138,7 @@ public class GameManager {
     private void tryMove(Chess chess, int gameId) {
         Position sourcePosition = inputView.readPosition();
         Position targetPosition = inputView.readPosition();
-        Piece targetPiece = chess.tryMove(sourcePosition, targetPosition);
-        gameDao.updateById(gameId, chess.getTurn());
-        boardDao.updateByGame(gameId, targetPosition, targetPiece);
-        boardDao.updateByGame(gameId, sourcePosition, new None(Color.NONE));
+        gameService.updateMovement(gameId, sourcePosition, targetPosition);
         outputView.printBoard(chess.getBoard());
     }
 }
