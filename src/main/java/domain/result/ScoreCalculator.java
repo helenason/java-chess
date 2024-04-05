@@ -9,6 +9,8 @@ import java.util.Map;
 
 public class ScoreCalculator {
 
+    private static final double HALF_SCORE = 0.5;
+
     public double calculate(Board board, Turn turn) {
         Color color = decideColor(turn);
         Map<Piece, Integer> remainPieces = board.findRemainPieces(color);
@@ -26,7 +28,7 @@ public class ScoreCalculator {
     private double scoreOfPawn(Board board, int pawnCount, Pawn pawn) {
         double score = pawn.calculateScore(pawnCount);
         if (board.hasSameColorPawnAtSameFile(pawn)) {
-            return score * 0.5;
+            return score * HALF_SCORE;
         }
         return score;
     }
