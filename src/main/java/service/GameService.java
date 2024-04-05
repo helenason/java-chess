@@ -9,7 +9,6 @@ import domain.Chess;
 import domain.board.Board;
 import domain.board.Turn;
 import domain.piece.Color;
-import domain.piece.None;
 import domain.piece.Piece;
 import domain.position.Position;
 import java.util.Map;
@@ -58,9 +57,10 @@ public class GameService {
 
     public void updateMovement(int gameId, Position sourcePosition, Position targetPosition) {
         Piece targetPiece = chess.tryMove(sourcePosition, targetPosition);
+        Piece sourcePiece = chess.getBoard().findPieceByPosition(sourcePosition);
         gameDao.updateById(gameId, chess.getTurn());
         boardDao.updateByGame(gameId, targetPosition, targetPiece);
-        boardDao.updateByGame(gameId, sourcePosition, new None(Color.NONE));
+        boardDao.updateByGame(gameId, sourcePosition, sourcePiece);
     }
 
     public void resetGame(int gameId) {
