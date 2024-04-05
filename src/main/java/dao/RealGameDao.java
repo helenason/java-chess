@@ -1,5 +1,6 @@
 package dao;
 
+import dao.mapper.ColorData;
 import domain.board.Turn;
 import domain.piece.Color;
 import java.sql.Connection;
@@ -7,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +21,7 @@ public class RealGameDao implements GameDao {
         try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("INSERT INTO game(turn) VALUES(?)", Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, TurnColor.asData(turn));
+            preparedStatement.setString(1, ColorData.asData(turn));
             preparedStatement.executeUpdate();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
             if (resultSet.next()) {
@@ -43,7 +43,7 @@ public class RealGameDao implements GameDao {
             while (resultSet.next()) {
                 int id = resultSet.getInt(1);
                 String rawTurn = resultSet.getString(2);
-                Color color = TurnColor.asColor(rawTurn);
+                Color color = ColorData.asColor(rawTurn);
                 games.put(id, new Turn(color));
             }
             return games;
@@ -61,7 +61,7 @@ public class RealGameDao implements GameDao {
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 String rawTurn = resultSet.getString("turn");
-                Turn turn = new Turn(TurnColor.asColor(rawTurn));
+                Turn turn = new Turn(ColorData.asColor(rawTurn));
                 return Optional.of(turn);
             }
             return Optional.empty();
@@ -75,7 +75,7 @@ public class RealGameDao implements GameDao {
         try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("UPDATE game SET turn = ? WHERE game_id = ?");
-            preparedStatement.setString(1, TurnColor.asData(turn));
+            preparedStatement.setString(1, ColorData.asData(turn));
             preparedStatement.setInt(2, id);
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -92,38 +92,6 @@ public class RealGameDao implements GameDao {
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("[DB_ERROR] 데이터베이스 에러입니다. 관리자에게 문의해주세요.");
-        }
-    }
-
-    private enum TurnColor {
-
-        WHITE(Color.WHITE, "white"),
-        BLACK(Color.BLACK, "black"),
-        NONE(Color.NONE, "none"),
-        ;
-
-        private final Color color;
-        private final String dataOutput;
-
-        TurnColor(Color color, String dataOutput) {
-            this.color = color;
-            this.dataOutput = dataOutput;
-        }
-
-        private static String asData(Turn turn) {
-            return Arrays.stream(values())
-                    .filter(turnColor -> turnColor.color == turn.color())
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
-                    .dataOutput;
-        }
-
-        private static Color asColor(String rawColor) {
-            return Arrays.stream(values())
-                    .filter(turnColor -> turnColor.dataOutput.equals(rawColor))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("[DB_ERROR] 저장할 수 없는 데이터입니다."))
-                    .color;
         }
     }
 }
