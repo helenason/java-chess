@@ -3,13 +3,14 @@ package dao;
 import dao.mapper.ColorData;
 import domain.board.Turn;
 import domain.piece.Color;
+import dto.GameData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class RealGameDao implements GameDao {
@@ -34,17 +35,18 @@ public class RealGameDao implements GameDao {
     }
 
     @Override
-    public Map<Integer, Turn> findAll() {
+    public List<GameData> findAll() {
         try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("SELECT * FROM game");
             ResultSet resultSet = preparedStatement.executeQuery();
-            Map<Integer, Turn> games = new HashMap<>();
+            List<GameData> games = new ArrayList<>();
             while (resultSet.next()) {
                 int id = resultSet.getInt(1);
                 String rawTurn = resultSet.getString(2);
                 Color color = ColorData.asColor(rawTurn);
-                games.put(id, new Turn(color));
+                Turn turn = new Turn(color);
+                games.add(new GameData(id, turn));
             }
             return games;
         } catch (SQLException e) {

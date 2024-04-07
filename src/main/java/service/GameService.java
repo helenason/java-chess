@@ -11,8 +11,11 @@ import domain.board.Turn;
 import domain.piece.Color;
 import domain.piece.Piece;
 import domain.position.Position;
+import dto.GameData;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GameService {
 
@@ -26,8 +29,10 @@ public class GameService {
     }
 
     public Set<Integer> findRooms() {
-        Map<Integer, Turn> games = gameDao.findAll();
-        return games.keySet();
+        List<GameData> games = gameDao.findAll();
+        return games.stream()
+                .map(GameData::id)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     public int createGame() {

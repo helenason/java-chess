@@ -6,7 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import dao.fake.FakeGameDao;
 import domain.board.Turn;
 import domain.piece.Color;
-import java.util.Map;
+import dto.GameData;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,12 +40,14 @@ public class FakeGameDaoTest {
         int gameId2 = gameDao.save(turn);
         int gameId3 = gameDao.save(turn);
 
-        Map<Integer, Turn> games = gameDao.findAll();
+        List<GameData> games = gameDao.findAll();
 
         assertAll(() -> {
-            assertThat(games).containsEntry(gameId1, turn);
-            assertThat(games).containsEntry(gameId2, turn);
-            assertThat(games).containsEntry(gameId3, turn);
+            assertThat(games).containsExactly(
+                    new GameData(gameId1, turn),
+                    new GameData(gameId2, turn),
+                    new GameData(gameId3, turn)
+            );
         });
     }
 
