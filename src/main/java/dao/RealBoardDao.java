@@ -9,6 +9,7 @@ import domain.position.File;
 import domain.position.Position;
 import domain.position.PositionGenerator;
 import domain.position.Rank;
+import dto.BoardData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -47,7 +48,7 @@ public class RealBoardDao implements BoardDao {
     }
 
     @Override
-    public Map<Position, Piece> findSquaresByGame(int gameId) {
+    public BoardData findSquaresByGame(int gameId) {
         try (Connection connection = daoConnection.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT * FROM board WHERE game_id = ?");
@@ -67,7 +68,7 @@ public class RealBoardDao implements BoardDao {
                 Piece piece = PieceData.asType(pieceType, color);
                 squares.put(PositionGenerator.generate(file, rank), piece);
             }
-            return squares;
+            return new BoardData(squares);
         } catch (SQLException e) {
             throw new RuntimeException("[DB_ERROR] 데이터베이스 에러입니다. 관리자에게 문의해주세요.");
         }

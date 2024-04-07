@@ -16,6 +16,7 @@ import domain.piece.Knight;
 import domain.piece.Piece;
 import domain.piece.Rook;
 import domain.position.Position;
+import dto.BoardData;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,8 +61,9 @@ public class FakeBoardDaoTest {
         boardDao.save(gameId, A2, actual2);
         boardDao.save(gameId, A3, actual3);
 
-        Map<Position, Piece> squares = boardDao.findSquaresByGame(gameId);
+        BoardData boardData = boardDao.findSquaresByGame(gameId);
 
+        Map<Position, Piece> squares = boardData.squares();
         assertAll(() -> {
             assertThat(squares).containsEntry(A1, actual1);
             assertThat(squares).containsEntry(A2, actual2);

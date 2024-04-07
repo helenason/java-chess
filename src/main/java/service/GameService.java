@@ -11,9 +11,9 @@ import domain.board.Turn;
 import domain.piece.Color;
 import domain.piece.Piece;
 import domain.position.Position;
+import dto.BoardData;
 import dto.GameData;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,8 +52,8 @@ public class GameService {
             boardDao.saveAll(gameId, board);
             return board;
         }
-        Map<Position, Piece> squares = boardDao.findSquaresByGame(gameId);
-        return Board.create(squares);
+        BoardData boardData = boardDao.findSquaresByGame(gameId);
+        return Board.create(boardData.squares());
     }
 
     private Turn createTurn(int gameId) {

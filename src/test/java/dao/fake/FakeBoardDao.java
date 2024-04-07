@@ -4,7 +4,7 @@ import dao.BoardDao;
 import domain.board.Board;
 import domain.piece.Piece;
 import domain.position.Position;
-import java.util.Collections;
+import dto.BoardData;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,9 +31,9 @@ public class FakeBoardDao implements BoardDao {
     }
 
     @Override
-    public Map<Position, Piece> findSquaresByGame(int gameId) {
+    public BoardData findSquaresByGame(int gameId) {
         Map<Position, Piece> squares = boards.get(gameId);
-        return Collections.unmodifiableMap(squares);
+        return new BoardData(squares);
     }
 
     @Override
