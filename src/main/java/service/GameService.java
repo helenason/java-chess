@@ -8,6 +8,7 @@ import domain.board.Turn;
 import domain.piece.Color;
 import domain.piece.Piece;
 import domain.position.Position;
+import domain.result.ChessResult;
 import dto.BoardData;
 import dto.GameData;
 import java.util.List;
@@ -51,9 +52,8 @@ public class GameService {
         return gameDao.findTurnById(gameId).orElseThrow(() -> new IllegalArgumentException("[ERROR] 유효하지 않은 차례입니다."));
     }
 
-    public Chess initChess(Board board, Turn turn) {
+    public void initChess(Board board, Turn turn) {
         chess = new Chess(board, turn);
-        return chess;
     }
 
     public void updateMovement(int gameId, Position sourcePosition, Position targetPosition) {
@@ -67,5 +67,21 @@ public class GameService {
     public void resetGame(int gameId) {
         boardDao.deleteByGame(gameId);
         gameDao.deleteById(gameId);
+    }
+
+    public ChessResult judge() {
+        return chess.judge();
+    }
+
+    public boolean canContinue() {
+        return chess.canContinue();
+    }
+
+    public Board getBoard() {
+        return chess.getBoard();
+    }
+
+    public Turn getTurn() {
+        return chess.getTurn();
     }
 }

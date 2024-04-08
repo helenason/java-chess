@@ -2,7 +2,6 @@ package controller;
 
 import dao.RealBoardDao;
 import dao.RealGameDao;
-import domain.Chess;
 import domain.board.Board;
 import domain.board.Turn;
 import domain.position.Position;
@@ -45,36 +44,34 @@ public class GameManager {
         Set<Integer> rooms = gameService.findRooms();
         outputView.printRooms(rooms);
 
-        RoomCommand roomCommand = requestRoomCommand();
-        int gameId = requestRoom(roomCommand, rooms);
+        int gameId = requestGame(rooms);
+        playGame(gameId);
 
-        Chess chess = initChess(roomCommand, gameId);
-
-        playGame(chess, gameId);
-
-        ChessResult result = chess.judge();
+        ChessResult result = gameService.judge();
         outputView.printResult(result);
         gameService.resetGame(gameId);
     }
 
-    private void playGame(Chess chess, int gameId) {
-        Command gameCommand;
-        do {
-            outputView.printTurn(chess.getTurn());
-            gameCommand = requestCommand();
-            if (gameCommand.isMove()) {
-                tryMoveUntilNoError(chess, gameId);
-            }
-        } while (chess.canContinue() && wantContinue(chess, gameCommand));
-    }
-
-    private RoomCommand requestRoomCommand() {
+    private int requestGame(Set<Integer> rooms) {
         try {
-            return inputView.readRoomCommand();
+            RoomCommand roomCommand = inputView.readRoomCommand();
+            int gameId = requestRoom(roomCommand, rooms);
+            initChess(roomCommand, gameId);
+            return gameId;
         } catch (IllegalArgumentException e) {
             outputView.printError(e.getMessage());
-            return requestRoomCommand();
+            inputView.clean();
+            return requestGame(rooms);
         }
+    }
+
+    private int requestRoom(RoomCommand roomCommand, Set<Integer> rooms) {
+        if (roomCommand.wantCreate()) {
+            return gameService.createGame();
+        }
+        int roomNumber = inputView.readRoomNumber();
+        validateRoomNumberRange(rooms, roomNumber);
+        return roomNumber;
     }
 
     private void validateRoomNumberRange(Set<Integer> rooms, int roomNumber) {
@@ -88,43 +85,29 @@ public class GameManager {
                 .noneMatch(number -> number == roomNumber);
     }
 
-    private Chess initChess(RoomCommand roomCommand, int gameId) {
-        Board board;
-        if (roomCommand.wantCreate()) {
-            board = gameService.createBoard(gameId);
-        } else {
-            board = gameService.findBoard(gameId);
-        }
+    private void initChess(RoomCommand roomCommand, int gameId) {
+        Board board = initBoard(roomCommand, gameId);
         Turn turn = gameService.findTurn(gameId);
-
-        Chess chess = gameService.initChess(board, turn);
-        outputView.printBoard(chess.getBoard());
-        return chess;
+        gameService.initChess(board, turn);
+        outputView.printBoard(gameService.getBoard());
     }
 
-    private int requestRoom(RoomCommand roomCommand, Set<Integer> rooms) {
-        try {
-            if (roomCommand.wantCreate()) {
-                return gameService.createGame();
+    private Board initBoard(RoomCommand roomCommand, int gameId) {
+        if (roomCommand.wantCreate()) {
+            return gameService.createBoard(gameId);
+        }
+        return gameService.findBoard(gameId);
+    }
+
+    private void playGame(int gameId) {
+        Command gameCommand;
+        do {
+            outputView.printTurn(gameService.getTurn());
+            gameCommand = requestCommand();
+            if (gameCommand.isMove()) {
+                tryMoveUntilNoError(gameId);
             }
-            int roomNumber = inputView.readRoomNumber();
-            validateRoomNumberRange(rooms, roomNumber);
-            return roomNumber;
-        } catch (IllegalArgumentException e) {
-            outputView.printError(e.getMessage());
-            return requestRoom(requestRoomCommand(), rooms);
-        }
-    }
-
-    private boolean wantContinue(Chess chess, Command command) {
-        if (command.isStart()) {
-            play();
-        }
-        if (command.isStatus()) {
-            ChessResult result = chess.judge();
-            outputView.printScore(result);
-        }
-        return command.wantContinue();
+        } while (gameService.canContinue() && wantContinue(gameCommand));
     }
 
     private Command requestCommand() {
@@ -137,9 +120,9 @@ public class GameManager {
         }
     }
 
-    private void tryMoveUntilNoError(Chess chess, int gameId) {
+    private void tryMoveUntilNoError(int gameId) {
         try {
-            tryMove(chess, gameId);
+            tryMove(gameId);
         } catch (IllegalArgumentException e) {
             outputView.printError(e.getMessage());
         } finally {
@@ -147,10 +130,21 @@ public class GameManager {
         }
     }
 
-    private void tryMove(Chess chess, int gameId) {
+    private void tryMove(int gameId) {
         Position sourcePosition = inputView.readPosition();
         Position targetPosition = inputView.readPosition();
         gameService.updateMovement(gameId, sourcePosition, targetPosition);
-        outputView.printBoard(chess.getBoard());
+        outputView.printBoard(gameService.getBoard());
+    }
+
+    private boolean wantContinue(Command command) {
+        if (command.isStart()) {
+            play();
+        }
+        if (command.isStatus()) {
+            ChessResult result = gameService.judge();
+            outputView.printScore(result);
+        }
+        return command.wantContinue();
     }
 }
