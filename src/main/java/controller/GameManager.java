@@ -1,6 +1,10 @@
 package controller;
 
+import dao.RealBoardDao;
+import dao.RealGameDao;
 import domain.Chess;
+import domain.board.Board;
+import domain.board.Turn;
 import domain.position.Position;
 import domain.result.ChessResult;
 import java.util.Set;
@@ -14,10 +18,10 @@ public class GameManager {
     private final OutputView outputView;
     private final GameService gameService;
 
-    public GameManager(InputView inputView, OutputView outputView, GameService gameService) {
+    public GameManager(InputView inputView, OutputView outputView) {
         this.inputView = inputView;
         this.outputView = outputView;
-        this.gameService = gameService;
+        this.gameService = new GameService(new RealGameDao(), new RealBoardDao());
     }
 
     public void start() {
@@ -85,7 +89,15 @@ public class GameManager {
     }
 
     private Chess initChess(RoomCommand roomCommand, int gameId) {
-        Chess chess = gameService.initChess(roomCommand, gameId);
+        Board board;
+        if (roomCommand.wantCreate()) {
+            board = gameService.createBoard(gameId);
+        } else {
+            board = gameService.findBoard(gameId);
+        }
+        Turn turn = gameService.findTurn(gameId);
+
+        Chess chess = gameService.initChess(board, turn);
         outputView.printBoard(chess.getBoard());
         return chess;
     }

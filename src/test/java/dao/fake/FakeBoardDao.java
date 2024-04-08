@@ -32,7 +32,7 @@ public class FakeBoardDao implements BoardDao {
 
     @Override
     public BoardData findSquaresByGame(int gameId) {
-        Map<Position, Piece> squares = boards.get(gameId);
+        Map<Position, Piece> squares = boards.getOrDefault(gameId, new HashMap<>());
         return new BoardData(squares);
     }
 

@@ -1,10 +1,7 @@
 package service;
 
-import controller.RoomCommand;
 import dao.BoardDao;
 import dao.GameDao;
-import dao.RealBoardDao;
-import dao.RealGameDao;
 import domain.Chess;
 import domain.board.Board;
 import domain.board.Turn;
@@ -23,9 +20,9 @@ public class GameService {
     private final BoardDao boardDao;
     private Chess chess;
 
-    public GameService() {
-        this.gameDao = new RealGameDao();
-        this.boardDao = new RealBoardDao();
+    public GameService(GameDao gameDao, BoardDao boardDao) {
+        this.gameDao = gameDao;
+        this.boardDao = boardDao;
     }
 
     public Set<Integer> findRooms() {
@@ -39,25 +36,24 @@ public class GameService {
         return gameDao.save(new Turn(Color.WHITE));
     }
 
-    public Chess initChess(RoomCommand roomCommand, int gameId) {
-        Board board = createBoard(roomCommand, gameId);
-        Turn turn = createTurn(gameId);
-        chess = new Chess(board, turn);
-        return chess;
+    public Board createBoard(int gameId) {
+        Board board = Board.create();
+        boardDao.saveAll(gameId, board);
+        return board;
     }
 
-    private Board createBoard(RoomCommand roomCommand, int gameId) {
-        if (roomCommand.wantCreate()) {
-            Board board = Board.create();
-            boardDao.saveAll(gameId, board);
-            return board;
-        }
+    public Board findBoard(int gameId) {
         BoardData boardData = boardDao.findSquaresByGame(gameId);
         return Board.create(boardData.squares());
     }
 
-    private Turn createTurn(int gameId) {
+    public Turn findTurn(int gameId) {
         return gameDao.findTurnById(gameId).orElseThrow(() -> new IllegalArgumentException("[ERROR] 유효하지 않은 차례입니다."));
+    }
+
+    public Chess initChess(Board board, Turn turn) {
+        chess = new Chess(board, turn);
+        return chess;
     }
 
     public void updateMovement(int gameId, Position sourcePosition, Position targetPosition) {
