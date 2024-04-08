@@ -49,7 +49,6 @@ public class GameManager {
 
         ChessResult result = gameService.judge();
         outputView.printResult(result);
-        gameService.resetGame(gameId);
     }
 
     private int requestGame(Set<Integer> rooms) {
@@ -75,14 +74,13 @@ public class GameManager {
     }
 
     private void validateRoomNumberRange(Set<Integer> rooms, int roomNumber) {
-        if (hasNotRoomNumber(rooms, roomNumber)) {
+        if (isInvalidRoomNumber(rooms, roomNumber)) {
             throw new IllegalArgumentException("[ERROR] 존재하는 방 번호를 입력해주세요.");
         }
     }
 
-    private boolean hasNotRoomNumber(Set<Integer> roomNumbers, int roomNumber) {
-        return roomNumbers.stream()
-                .noneMatch(number -> number == roomNumber);
+    private boolean isInvalidRoomNumber(Set<Integer> roomNumbers, int roomNumber) {
+        return !roomNumbers.contains(roomNumber);
     }
 
     private void initChess(RoomCommand roomCommand, int gameId) {

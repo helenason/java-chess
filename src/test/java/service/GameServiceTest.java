@@ -18,7 +18,6 @@ import domain.position.Position;
 import domain.position.PositionGenerator;
 import domain.position.Rank;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -130,20 +129,5 @@ public class GameServiceTest {
 
         assertThat(board.findPieceByPosition(source)).isEqualTo(new None(Color.NONE));
         assertThat(board.findPieceByPosition(target)).isEqualTo(new Pawn(Color.WHITE));
-    }
-
-    @Test
-    @DisplayName("객체와 데이터베이스 내 데이터를 초기화한다.")
-    void resetGame() {
-        GameService gameService = new GameService(gameDao, boardDao);
-        int gameId = gameService.createGame();
-        Board board = gameService.createBoard(gameId);
-        gameService.initChess(board, new Turn(Color.WHITE));
-
-        gameService.resetGame(gameId);
-
-//        assertThat(board.getSquares()).hasSize(0);
-        assertThat(boardDao.findSquaresByGame(gameId).squares()).hasSize(0);
-        assertThat(gameDao.findTurnById(gameId)).isEqualTo(Optional.empty());
     }
 }

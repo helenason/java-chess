@@ -64,11 +64,6 @@ public class GameService {
         boardDao.updateByGame(gameId, sourcePosition, sourcePiece);
     }
 
-    public void resetGame(int gameId) {
-        boardDao.deleteByGame(gameId);
-        gameDao.deleteById(gameId);
-    }
-
     public ChessResult judge() {
         return chess.judge();
     }
